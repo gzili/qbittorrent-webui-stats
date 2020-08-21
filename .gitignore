@@ -1,4 +1,7 @@
-# Python virtual environment
+# Node modules directory
+node_modules/
+
+# Python virtual environments
 .venv/
 
 # Local configuration files
