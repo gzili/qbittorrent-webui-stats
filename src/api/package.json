@@ -1,0 +1,16 @@
+{
+  "name": "qb-stats-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "api.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Gustas Zilinskas",
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^7.1.0",
+    "express": "^4.17.1",
+    "sqlite3": "^5.0.0"
+  }
+}
