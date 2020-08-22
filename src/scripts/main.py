@@ -1,4 +1,3 @@
-#!/home/pi/python/qb-stats/.venv/bin/python
 # Standard library modules
 import argparse
 import os.path
