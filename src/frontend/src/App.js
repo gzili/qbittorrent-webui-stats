@@ -84,6 +84,17 @@ function TorrentListView(props) {
   );
 }
 
+function TorrentActivityView(props) {
+  return (
+    <div>
+      <p>
+        Torrent: {props.data.name}<br />
+        <button onClick={props.onReturn}>Back to torrents list</button>
+      </p>
+    </div>
+  );
+}
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -91,14 +102,14 @@ class App extends React.Component {
       isLoaded: false,
     };
     this.handleRowClick = this.handleRowClick.bind(this);
-    this.handleBackClick = this.handleBackClick.bind(this);
+    this.handleReturn = this.handleReturn.bind(this);
   }
   handleRowClick(e, row) {
     this.setState({
       currentItem: row.getData(),
     });
   }
-  handleBackClick() {
+  handleReturn() {
     this.setState({
       currentItem: null,
     });
@@ -123,13 +134,11 @@ class App extends React.Component {
     if (this.state.isLoaded) {
       if (this.state.currentItem) {
         return (
-          <div>
-            <p>
-              Torrent: {this.state.currentItem.name}<br />
-              <button onClick={this.handleBackClick}>Back to torrents list</button>
-            </p>
-          </div>
-        )
+          <TorrentActivityView
+            data={this.state.currentItem}
+            onReturn={this.handleReturn}
+          />
+        );
       }
       else {
         return (
