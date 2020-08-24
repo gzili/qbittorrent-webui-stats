@@ -2,7 +2,7 @@
 
 const express = require('express')
 const app = express()
-const port = 3000
+const port = 3001
 
 const db = require('better-sqlite3')('../scripts/stats.db')
 
@@ -11,7 +11,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/stats.json', (req, res) => {
-  const torrents = db.prepare('SELECT * FROM torrents LIMIT 2').all();
+  const torrents = db.prepare('SELECT * FROM torrents').all();
   for (let i = 0; i < torrents.length; ++i) {
     torrents[i]['activity'] = db.prepare('SELECT * FROM activity WHERE hash = ?').all(torrents[i]['hash']);
   }
