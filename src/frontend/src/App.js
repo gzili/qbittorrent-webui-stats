@@ -3,7 +3,10 @@ import './App.css';
 
 import 'react-tabulator/css/tabulator_site.min.css';
 import 'react-tabulator/lib/styles.css';
-import { ReactTabulator } from 'react-tabulator'
+import { ReactTabulator } from 'react-tabulator';
+
+import { FontAwesomeIcon as FAIcon } from '@fortawesome/react-fontawesome';
+import { faCircleNotch } from '@fortawesome/free-solid-svg-icons';
 
 function zeroPad(x) {
   return (x >= 10) ? x : '0' + x;
@@ -50,20 +53,43 @@ function secsToTime(cell) {
   return str;
 }
 
+function MainView(props) {
+  return (
+    <div className='mainViewContainer'>
+      <div className='loadingIcon'>
+        <FAIcon icon={faCircleNotch} spin />
+      </div>
+      <div className='loadingText'>Fetching data</div>
+    </div>
+  );
+}
+
+function TorrentListView(props) {
+  const columns = [
+    {title: 'Name', field: 'name', widthGrow: 2},
+    {title: 'Size', field: 'size', formatter: bytesToUnits},
+    {title: 'Uploaded', field: 'lastChange.uploaded', formatter: bytesToUnits},
+    {title: 'Time Active', field: 'lastChange.time_active', formatter: secsToTime},
+    {title: 'Added on', field: 'added_on', formatter: formatDate},
+    {title: 'Last Activity', field: 'last_activity', formatter: formatDate},
+  ];
+  return (
+    <ReactTabulator
+      data={props.data}
+      columns={columns}
+      layout='fitData'
+      initialSort={[{column: 'added_on', dir: 'desc'}]}
+      rowClick={props.onRowClick}
+      />
+  );
+}
+
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       isLoaded: false,
     };
-    this.torrentsTableCols = [
-      {title: 'Name', field: 'name', widthGrow: 2},
-      {title: 'Size', field: 'size', formatter: bytesToUnits},
-      {title: 'Uploaded', field: 'lastChange.uploaded', formatter: bytesToUnits},
-      {title: 'Time Active', field: 'lastChange.time_active', formatter: secsToTime},
-      {title: 'Added on', field: 'added_on', formatter: formatDate},
-      {title: 'Last Activity', field: 'last_activity', formatter: formatDate},
-    ];
     this.handleRowClick = this.handleRowClick.bind(this);
     this.handleBackClick = this.handleBackClick.bind(this);
   }
@@ -107,18 +133,15 @@ class App extends React.Component {
       }
       else {
         return (
-          <ReactTabulator
+          <TorrentListView
             data={this.state.data}
-            columns={this.torrentsTableCols}
-            layout='fitData'
-            initialSort={[{column: 'added_on', dir: 'desc'}]}
-            rowClick={this.handleRowClick}
-            />
-        );
+            onRowClick={this.handleRowClick}
+          />
+        )
       }
     }
     else {
-      return <code>Fetching data...</code>
+      return <MainView />;
     }
   }
 }
