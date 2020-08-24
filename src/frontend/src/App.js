@@ -30,7 +30,7 @@ function bytesToUnits(cell) {
   let units = ['bytes', 'KB', 'MB', 'GB'];
   let p = 0;
   while (Math.pow(1024, p) <= bytes) ++p;
-  return `${parseFloat((bytes / Math.pow(1024, p - 1)).toFixed(2))} ${units[p - 1]}`;
+  return (p > 0) ? `${parseFloat((bytes / Math.pow(1024, p - 1)).toFixed(2))} ${units[p - 1]}` : `${bytes} ${units[p]}`;
 }
 
 function secsToTime(cell) {
