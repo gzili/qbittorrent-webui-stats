@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 
-import 'react-tabulator/css/tabulator.css';
+import 'react-tabulator/css/tabulator_site.min.css';
 import 'react-tabulator/lib/styles.css';
 import { ReactTabulator } from 'react-tabulator'
 
@@ -56,8 +56,7 @@ class App extends React.Component {
     this.state = {
       isLoaded: false,
     };
-    this.tableCols = [
-      //{title: 'Hash', field: 'hash'},
+    this.torrentsTableCols = [
       {title: 'Name', field: 'name', widthGrow: 2},
       {title: 'Size', field: 'size', formatter: bytesToUnits},
       {title: 'Uploaded', field: 'lastChange.uploaded', formatter: bytesToUnits},
@@ -65,6 +64,18 @@ class App extends React.Component {
       {title: 'Added on', field: 'added_on', formatter: formatDate},
       {title: 'Last Activity', field: 'last_activity', formatter: formatDate},
     ];
+    this.handleRowClick = this.handleRowClick.bind(this);
+    this.handleBackClick = this.handleBackClick.bind(this);
+  }
+  handleRowClick(e, row) {
+    this.setState({
+      currentItem: row.getData(),
+    });
+  }
+  handleBackClick() {
+    this.setState({
+      currentItem: null,
+    });
   }
   fetchData() {
     fetch('/stats.json').then(response => {
@@ -72,7 +83,6 @@ class App extends React.Component {
         for (let row of data) {
           row.lastChange = row.activity[row.activity.length - 1];
         }
-        console.log(data);
         this.setState({
           isLoaded: true,
           data: data,
@@ -85,13 +95,27 @@ class App extends React.Component {
   }
   render() {
     if (this.state.isLoaded) {
-      return (
-        <ReactTabulator
-          data={this.state.data}
-          columns={this.tableCols}
-          layout='fitData'
-          />
-      );
+      if (this.state.currentItem) {
+        return (
+          <div>
+            <p>
+              Torrent: {this.state.currentItem.name}<br />
+              <button onClick={this.handleBackClick}>Back to torrents list</button>
+            </p>
+          </div>
+        )
+      }
+      else {
+        return (
+          <ReactTabulator
+            data={this.state.data}
+            columns={this.torrentsTableCols}
+            layout='fitData'
+            initialSort={[{column: 'added_on', dir: 'desc'}]}
+            rowClick={this.handleRowClick}
+            />
+        );
+      }
     }
     else {
       return <code>Fetching data...</code>
