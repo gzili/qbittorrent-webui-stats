@@ -85,12 +85,24 @@ function TorrentListView(props) {
 }
 
 function TorrentActivityView(props) {
+  const columns = [
+    {title: 'Time', field: 'timestamp', formatter: formatDate},
+    {title: 'Uploaded', field: 'uploaded', formatter: bytesToUnits},
+    {title: 'Time Active', field: 'time_active', formatter: secsToTime},
+  ];
   return (
     <div>
       <p>
         Torrent: {props.data.name}<br />
         <button onClick={props.onReturn}>Back to torrents list</button>
       </p>
+      <div>
+        <ReactTabulator
+          data={props.data.activity}
+          columns={columns}
+          layout={'fitData'}
+        />
+      </div>
     </div>
   );
 }
