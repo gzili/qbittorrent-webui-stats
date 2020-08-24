@@ -78,8 +78,9 @@ function TorrentListView(props) {
       data={props.data}
       columns={columns}
       layout='fitData'
-      initialSort={[{column: 'added_on', dir: 'desc'}]}
+      initialSort={props.initialSort}
       rowClick={props.onRowClick}
+      dataSorted={props.onSort}
       />
   );
 }
@@ -110,16 +111,24 @@ function TorrentActivityView(props) {
 class App extends React.Component {
   constructor(props) {
     super(props);
+    this.torrentListSort = [{column: 'added_on', dir: 'desc'}];
     this.state = {
       isLoaded: false,
     };
     this.handleRowClick = this.handleRowClick.bind(this);
+    this.saveSortData = this.saveSortData.bind(this);
     this.handleReturn = this.handleReturn.bind(this);
   }
   handleRowClick(e, row) {
     this.setState({
       currentItem: row.getData(),
     });
+  }
+  saveSortData(sorters) {
+    this.torrentListSort = [{
+      column: sorters[0].column,
+      dir: sorters[0].dir,
+    }];
   }
   handleReturn() {
     this.setState({
@@ -156,7 +165,9 @@ class App extends React.Component {
         return (
           <TorrentListView
             data={this.state.data}
+            initialSort={this.torrentListSort}
             onRowClick={this.handleRowClick}
+            onSort={this.saveSortData}
           />
         )
       }
