@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOMServer from 'react-dom/server';
 import './App.css';
 
 import 'react-tabulator/css/tabulator_site.min.css';
@@ -6,7 +7,7 @@ import 'react-tabulator/lib/styles.css';
 import { ReactTabulator } from 'react-tabulator';
 
 import { FontAwesomeIcon as FAIcon } from '@fortawesome/react-fontawesome';
-import { faCircleNotch } from '@fortawesome/free-solid-svg-icons';
+import { faCircleNotch, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 function zeroPad(x) {
   return (x >= 10) ? x : '0' + x;
@@ -65,8 +66,17 @@ function MainView(props) {
 }
 
 function TorrentListView(props) {
+  const icon = ReactDOMServer.renderToStaticMarkup(
+    <FAIcon className='contextMenuIcon' icon={faTrash} fixedWidth />
+  );
+  const cellMenu = [
+    {
+      label: `${icon} Delete torrent`,
+      action: props.onTorrentDelete,
+    }
+  ];
   const columns = [
-    {title: 'Name', field: 'name', widthGrow: 2},
+    {title: 'Name', field: 'name', widthGrow: 2, contextMenu: cellMenu},
     {title: 'Size', field: 'size', formatter: bytesToUnits},
     {title: 'Uploaded', field: 'lastChange.uploaded', formatter: bytesToUnits},
     {title: 'Time Active', field: 'lastChange.time_active', formatter: secsToTime},
@@ -79,8 +89,8 @@ function TorrentListView(props) {
       columns={columns}
       layout='fitData'
       initialSort={props.initialSort}
-      rowClick={props.onRowClick}
       dataSorted={props.onSort}
+      rowClick={props.onRowClick}
       />
   );
 }
@@ -117,6 +127,7 @@ class App extends React.Component {
     };
     this.handleRowClick = this.handleRowClick.bind(this);
     this.saveSortData = this.saveSortData.bind(this);
+    this.deleteTorrent = this.deleteTorrent.bind(this);
     this.handleReturn = this.handleReturn.bind(this);
   }
   handleRowClick(e, row) {
@@ -129,6 +140,9 @@ class App extends React.Component {
       column: sorters[0].column,
       dir: sorters[0].dir,
     }];
+  }
+  deleteTorrent(e, cell) {
+    console.log(cell.getRow().getData().hash);
   }
   handleReturn() {
     this.setState({
@@ -166,8 +180,9 @@ class App extends React.Component {
           <TorrentListView
             data={this.state.data}
             initialSort={this.torrentListSort}
-            onRowClick={this.handleRowClick}
             onSort={this.saveSortData}
+            onRowClick={this.handleRowClick}
+            onTorrentDelete={this.deleteTorrent}
           />
         )
       }
