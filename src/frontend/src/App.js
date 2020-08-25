@@ -150,7 +150,7 @@ class App extends React.Component {
     });
   }
   fetchData() {
-    fetch('/stats.json').then(response => {
+    fetch('/stats').then(response => {
       response.json().then(data => {
         for (let row of data) {
           row.lastChange = row.activity[row.activity.length - 1];
