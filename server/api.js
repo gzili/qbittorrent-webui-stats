@@ -24,8 +24,7 @@ app.get('/stats', (req, res) => {
   for (let i = 0; i < torrents.length; ++i) {
     torrents[i]['activity'] = db.prepare('SELECT * FROM activity WHERE hash = ?').all(torrents[i]['hash']);
   }
-  res.setHeader('Content-Type', 'application/json');
-  res.send(JSON.stringify(torrents));
+  res.json(torrents);
 })
 
 app.post('/delete', (req, res) => {
