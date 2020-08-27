@@ -20,11 +20,11 @@ app.get('/', (req, res) => {
 })
 
 app.get('/stats', (req, res) => {
-  const torrents = db.prepare('SELECT * FROM torrents').all();
-  for (let i = 0; i < torrents.length; ++i) {
-    torrents[i]['activity'] = db.prepare('SELECT * FROM activity WHERE hash = ?').all(torrents[i]['hash']);
+  const items = db.prepare('SELECT * FROM torrents').all();
+  for (let item of items) {
+    item.activity = db.prepare('SELECT * FROM activity WHERE hash = ?').all(item.hash);
   }
-  res.json(torrents);
+  res.json(items);
 })
 
 app.post('/delete', (req, res) => {
