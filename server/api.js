@@ -2,16 +2,11 @@ const express = require('express')
 const app = express()
 const port = 3001
 
-const config = require('./config.local.json');
-const db = require('better-sqlite3')(config.dbFile, {fileMustExist: true});
-
 const http = require('http');
 
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "http://localhost:3000"); // update to match the domain you will make the request from
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
+const config = require('./config.local.json');
+
+const db = require('better-sqlite3')(config.dbFile, {fileMustExist: true});
 
 app.use('/delete', express.text());
 
