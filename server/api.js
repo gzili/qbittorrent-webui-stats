@@ -4,8 +4,8 @@ const express = require('express')
 const app = express()
 const port = 3001
 
-// const db = require('better-sqlite3')('../scripts/stats.db')
-const db = require('better-sqlite3')('remote/stats.db', {fileMustExist: true});
+const config = require('./config.local.json');
+const db = require('better-sqlite3')(config.dbFile, {fileMustExist: true});
 
 const http = require('http');
 
