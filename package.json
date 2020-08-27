@@ -22,7 +22,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "dev-server": "nodemon server/api.js",
-    "serve": "node server/api.js"
+    "serve": "NODE_ENV=production node server/api.js"
   },
   "eslintConfig": {
     "extends": "react-app"
