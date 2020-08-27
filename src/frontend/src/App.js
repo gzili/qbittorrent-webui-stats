@@ -142,7 +142,15 @@ class App extends React.Component {
     }];
   }
   deleteTorrent(e, cell) {
-    console.log(cell.getRow().getData().hash);
+    const hash = cell.getRow().getData().hash;
+    fetch('/delete', {
+      method: 'POST',
+      body: hash,
+    }).then(response => {
+      if (response.ok) {
+        this.fetchData();
+      }
+    });
   }
   handleReturn() {
     this.setState({
@@ -150,7 +158,9 @@ class App extends React.Component {
     });
   }
   fetchData() {
-    fetch('/stats').then(response => {
+    fetch('/stats', {
+      cache: 'no-store',
+    }).then(response => {
       response.json().then(data => {
         for (let row of data) {
           row.lastChange = row.activity[row.activity.length - 1];
