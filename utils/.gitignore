@@ -1,0 +1,14 @@
+# Node modules directory
+node_modules/
+
+# Python virtual environments
+.venv/
+
+# Local configuration files
+*.conf
+
+# Local database files
+*.db
+
+# Directories that are local to a specific machine
+*.local/
