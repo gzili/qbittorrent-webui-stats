@@ -8,11 +8,9 @@ const config = require('./config.local.json');
 
 const db = require('better-sqlite3')(config.dbFile, {fileMustExist: true});
 
-app.use('/delete', express.text());
+app.use(express.static('build'));
 
-app.get('/', (req, res) => {
-  res.send('qBittorrent WebUI statistics API server root.');
-})
+app.use('/delete', express.text());
 
 app.get('/stats', (req, res) => {
   const items = db.prepare('SELECT * FROM torrents').all();
