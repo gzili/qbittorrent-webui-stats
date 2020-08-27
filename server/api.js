@@ -16,22 +16,7 @@ app.use(function(req, res, next) {
 app.use('/delete', express.text());
 
 app.get('/', (req, res) => {
-  let str = '';
-  const reqOpts = {
-    host: 'localhost',
-    port: 8888,
-    path: '/api/v2/app/version',
-  };
-  http.request(reqOpts, response => {
-    response.on('data', chunk => {
-      str += chunk;
-    });
-    response.on('end', () => {
-      console.log(str);
-      res.send(str);
-    });
-  }).end();
-  // res.send('qBittorrent WebUI statistics API server');
+  res.send('qBittorrent WebUI statistics API server root.');
 })
 
 app.get('/stats', (req, res) => {
@@ -45,17 +30,11 @@ app.get('/stats', (req, res) => {
 
 app.post('/delete', (req, res) => {
   const hash = req.body;
-  const qbRequestOptions = {
-    host: 'localhost',
-    port: 8888,
-    path: `/api/v2/torrents/delete?hashes=${hash}&deleteFiles=true`,
-  };
-  let qbResponse = '';
-  http.request(qbRequestOptions, response => {
-    response.on('data', chunk => {
-      qbResponse += chunk;
-    });
-    response.on('end', () => {
+  const url = `http://localhost:8888/api/v2/torrents/delete?hashes=${hash}&deleteFiles=true`;
+
+  http.get(url, qbRes => {
+    qbRes.on('data', () => {});
+    qbRes.on('end', () => {
       const torrentListChanges = db.prepare('DELETE FROM torrents WHERE hash = ?').run(hash);
       const activityChanges = db.prepare('DELETE FROM activity WHERE hash = ?').run(hash);
       console.log(`DELETED torrent with hash ${hash}`);
@@ -63,7 +42,7 @@ app.post('/delete', (req, res) => {
       console.log(`Rows affected in activity table: ${activityChanges.changes}`);
       res.end();
     });
-  }).end();
+  });
 })
 
 app.listen(port, () => {
