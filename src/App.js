@@ -65,34 +65,42 @@ function MainView(props) {
   );
 }
 
-function TorrentListView(props) {
-  const icon = ReactDOMServer.renderToStaticMarkup(
-    <FAIcon className='contextMenuIcon' icon={faTrash} fixedWidth />
-  );
-  const cellMenu = [
-    {
-      label: `${icon} Delete torrent`,
-      action: props.onTorrentDelete,
-    }
-  ];
-  const columns = [
-    {title: 'Name', field: 'name', widthGrow: 2, contextMenu: cellMenu},
-    {title: 'Size', field: 'size', formatter: bytesToUnits},
-    {title: 'Uploaded', field: 'lastChange.uploaded', formatter: bytesToUnits},
-    {title: 'Time Active', field: 'lastChange.time_active', formatter: secsToTime},
-    {title: 'Added on', field: 'added_on', formatter: formatDate},
-    {title: 'Last Activity', field: 'last_activity', formatter: formatDate},
-  ];
-  return (
-    <ReactTabulator
-      data={props.data}
-      columns={columns}
-      layout='fitData'
-      initialSort={props.initialSort}
-      dataSorted={props.onSort}
-      rowClick={props.onRowClick}
-      />
-  );
+class TorrentListView extends React.Component {
+  constructor(props) {
+    super(props);
+    const deleteIcon = ReactDOMServer.renderToStaticMarkup(
+      <FAIcon className='contextMenuIcon' icon={faTrash} fixedWidth />
+    );
+    const cellMenu = [
+      {
+        label: `${deleteIcon} Delete torrent`,
+        action: props.onTorrentDelete,
+      }
+    ];
+    this.columns = [
+      {title: 'Name', field: 'name', widthGrow: 2, contextMenu: cellMenu},
+      {title: 'Size', field: 'size', formatter: bytesToUnits},
+      {title: 'Uploaded', field: 'lastChange.uploaded', formatter: bytesToUnits},
+      {title: 'Time Active', field: 'lastChange.time_active', formatter: secsToTime},
+      {title: 'Added on', field: 'added_on', formatter: formatDate},
+      {title: 'Last Activity', field: 'last_activity', formatter: formatDate},
+    ];
+  }
+  render() {
+    return (
+      <ReactTabulator
+        data={this.props.data}
+        columns={this.columns}
+        layout='fitData'
+        initialSort={this.props.initialSort}
+        dataSorted={this.props.onSort}
+        rowClick={this.props.onRowClick}
+        dataLoaded={() => {
+          window.scroll(0, this.props.scrollY);
+        }}
+        />
+    );
+  }
 }
 
 function TorrentActivityView(props) {
@@ -121,6 +129,7 @@ function TorrentActivityView(props) {
 class App extends React.Component {
   constructor(props) {
     super(props);
+    this.scrollY = 0;
     this.torrentListSort = [{column: 'added_on', dir: 'desc'}];
     this.state = {
       isLoaded: false,
@@ -131,6 +140,7 @@ class App extends React.Component {
     this.handleReturn = this.handleReturn.bind(this);
   }
   handleRowClick(e, row) {
+    this.scrollY = window.scrollY;
     this.setState({
       currentItem: row.getData(),
     });
@@ -188,6 +198,7 @@ class App extends React.Component {
       else {
         return (
           <TorrentListView
+            scrollY={this.scrollY}
             data={this.state.data}
             initialSort={this.torrentListSort}
             onSort={this.saveSortData}
