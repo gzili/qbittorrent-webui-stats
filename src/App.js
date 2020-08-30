@@ -19,11 +19,11 @@ function formatDate(cell) {
   let dd = zeroPad(date.getDate());
   let MM = zeroPad(date.getMonth()+1);
   let yyyy = date.getFullYear();
-  let h = date.getHours();
+  let hh = zeroPad(date.getHours());
   let mm = zeroPad(date.getMinutes());
   let ss = zeroPad(date.getSeconds());
   // let shortMonth = shortMonths[date.getMonth()];
-  return `${yyyy}-${MM}-${dd} ${h}:${mm}:${ss}`;
+  return `${yyyy}-${MM}-${dd} ${hh}:${mm}:${ss}`;
 }
 
 function bytesToUnits(cell) {
