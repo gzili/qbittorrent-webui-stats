@@ -44,7 +44,7 @@ function secsToTime(cell, diffSecs) {
   secs = Math.floor(secs / 60);
   let m = secs % 60;
   secs = Math.floor(secs / 60);
-  let h = secs % 60;
+  let h = secs % 24;
   secs = Math.floor(secs / 24);
   let d = secs;
 
