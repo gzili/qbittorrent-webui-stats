@@ -34,8 +34,11 @@ function bytesToUnits(cell) {
   return (p > 0) ? `${parseFloat((bytes / Math.pow(1024, p - 1)).toFixed(2))} ${units[p - 1]}` : `${bytes} ${units[p]}`;
 }
 
-function secsToTime(cell) {
-  let secs = cell.getValue();
+function secsToTime(cell, diffSecs) {
+  const isDiff = Number.isInteger(diffSecs);
+  let secs = (isDiff) ? diffSecs - cell.getValue() : cell.getValue();
+
+  if (secs <= 0) return 'Just now';
 
   let s = secs % 60;
   secs = Math.floor(secs / 60);
@@ -49,7 +52,8 @@ function secsToTime(cell) {
   if (d) str += d + 'd ';
   if (h) str += h + 'h ';
   if (!d && m) str += m + 'm ';
-  if (!h && s) str += s + 's';
+  if (!h && s) str += s + 's ';
+  if (isDiff) str += ' ago';
 
   return str;
 }
@@ -83,7 +87,7 @@ class TorrentListView extends React.Component {
       {title: 'Uploaded', field: 'lastChange.uploaded', formatter: bytesToUnits},
       {title: 'Time Active', field: 'lastChange.time_active', formatter: secsToTime},
       {title: 'Added on', field: 'added_on', formatter: formatDate},
-      {title: 'Last Activity', field: 'last_activity', formatter: formatDate},
+      {title: 'Last Activity', field: 'last_activity', formatter: secsToTime, formatterParams: this.props.currentSecs},
     ];
   }
   render() {
@@ -175,6 +179,8 @@ class App extends React.Component {
         for (let row of data) {
           row.lastChange = row.activity[row.activity.length - 1];
         }
+        const now = new Date();
+        this.currentSecs = Math.floor(new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), 0, 0).getTime() / 1000);
         this.setState({
           isLoaded: true,
           data: data,
@@ -204,6 +210,7 @@ class App extends React.Component {
             onSort={this.saveSortData}
             onRowClick={this.handleRowClick}
             onTorrentDelete={this.deleteTorrent}
+            currentSecs={this.currentSecs}
           />
         )
       }
