@@ -7,7 +7,7 @@ import 'react-tabulator/lib/styles.css';
 import { ReactTabulator } from 'react-tabulator';
 
 import { FontAwesomeIcon as FAIcon } from '@fortawesome/react-fontawesome';
-import { faCircleNotch, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faCircleNotch, faTrash, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 function zeroPad(x) {
   return (x >= 10) ? x : '0' + x;
@@ -107,7 +107,7 @@ class TorrentListView extends React.Component {
 }
 
 function DetailsValue(props) {
-  return <div className='detailsValue'>props.children</div>;
+  return <div className='detailsValue'>{props.children}</div>;
 }
 
 function TorrentActivityView(props) {
@@ -119,10 +119,10 @@ function TorrentActivityView(props) {
   const detailsKeys = ['Size', 'Added on', 'Uploaded', 'Time Active', 'Last activity'];
   return (
     <main className='activityViewContainer'>
-      <header className='itemInfo'>
-        <h1 className='itemName'>{props.data.name}</h1>
-        <small className='torrentHash'>{props.data.hash}</small>
-        <details classname='itemDetails'>
+      <header className='itemProps'>
+        <h2 className='itemName'>{props.data.name}</h2>
+        <small className='itemHash'>{props.data.hash}</small>
+        <div className='itemDetails'>
           <div className='detailsColKeys'>
             {
               detailsKeys.map((k, i) => {
@@ -132,17 +132,30 @@ function TorrentActivityView(props) {
           </div>
           <div className='detailsColValues'>
             <DetailsValue>{bytesToUnits(props.data.size)}</DetailsValue>
-            <DetailsValue>{formatDate(props)}</DetailsValue>
+            <DetailsValue>{formatDate(props.data.added_on)}</DetailsValue>
+            <DetailsValue>{bytesToUnits(props.data.lastChange.uploaded)}</DetailsValue>
+            <DetailsValue>{secsToTime(props.data.lastChange.time_active)}</DetailsValue>
+            <DetailsValue>{formatDate(props.data.last_activity)}</DetailsValue>
           </div>
-        </details>
+        </div>
       </header>
-      <div>
+      <section className='activitySection'>
+        <h2 className='activitySectionName'>Daily upload amount</h2>
+      </section>
+      <section className='activitySection'>
+        <h2 className='activitySectionName'>Hourly statistics entries</h2>
         <ReactTabulator
           data={props.data.activity}
           columns={columns}
-          layout={'fitData'}
+          options={{
+            layout: 'fitDataStretch',
+            headerSort: false,
+          }}
         />
-      </div>
+      </section>
+      <button className='returnButtonFloating' onClick={props.onReturn}>
+        <FAIcon icon={faArrowLeft} />
+      </button>
     </main>
   );
 }
