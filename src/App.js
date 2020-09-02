@@ -107,18 +107,36 @@ class TorrentListView extends React.Component {
   }
 }
 
+function DetailsValue(props) {
+  return <div className='detailsValue'>props.children</div>;
+}
+
 function TorrentActivityView(props) {
   const columns = [
     {title: 'Time', field: 'timestamp', formatter: formatDate},
     {title: 'Uploaded', field: 'uploaded', formatter: bytesToUnits},
     {title: 'Time Active', field: 'time_active', formatter: secsToTime},
   ];
+  const detailsKeys = ['Size', 'Added on', 'Uploaded', 'Time Active', 'Last activity'];
   return (
-    <div>
-      <p>
-        Torrent: {props.data.name}<br />
-        <button onClick={props.onReturn}>Back to torrents list</button>
-      </p>
+    <main className='activityViewContainer'>
+      <header className='itemInfo'>
+        <h1 className='itemName'>{props.data.name}</h1>
+        <small className='torrentHash'>{props.data.hash}</small>
+        <details classname='itemDetails'>
+          <div className='detailsColKeys'>
+            {
+              detailsKeys.map((k, i) => {
+                return <div key={i} className='detailsKey'>{k}</div>;
+              })
+            }
+          </div>
+          <div className='detailsColValues'>
+            <DetailsValue>{bytesToUnits(props.data.size)}</DetailsValue>
+            <DetailsValue>{formatDate(props)}</DetailsValue>
+          </div>
+        </details>
+      </header>
       <div>
         <ReactTabulator
           data={props.data.activity}
@@ -126,7 +144,7 @@ function TorrentActivityView(props) {
           layout={'fitData'}
         />
       </div>
-    </div>
+    </main>
   );
 }
 
