@@ -9,6 +9,8 @@ import { ReactTabulator } from 'react-tabulator';
 import { FontAwesomeIcon as FAIcon } from '@fortawesome/react-fontawesome';
 import { faCircleNotch, faTrash, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, LabelList} from 'recharts';
+
 function zeroPad(x) {
   return (x >= 10) ? x : '0' + x;
 }
@@ -130,7 +132,7 @@ function TorrentActivityView(props) {
     const items = daysObj[day];
     const dayTotal = items[0].uploaded - items[items.length - 1].uploaded;
     statsArray.push({
-      name: day,
+      date: day,
       uploaded: dayTotal,
     });
   }
@@ -159,6 +161,15 @@ function TorrentActivityView(props) {
       </header>
       <section className='activitySection'>
         <h2 className='activitySectionName'>Daily upload amount</h2>
+        <ResponsiveContainer width='100%' height={500}>
+          <BarChart data={statsArray}>
+            <XAxis dataKey='date' />
+            <YAxis width={65} tickFormatter={ v => bytesToUnits(v) } />
+            <Bar dataKey='uploaded' fill='#4CAF50'>
+              <LabelList dataKey='uploaded' position='insideTop' formatter={v => bytesToUnits(v) } />
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
       </section>
       <section className='activitySection'>
         <h2 className='activitySectionName'>Hourly statistics entries</h2>
