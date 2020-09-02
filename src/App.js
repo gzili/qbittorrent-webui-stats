@@ -117,6 +117,24 @@ function TorrentActivityView(props) {
     {title: 'Time Active', field: 'time_active', formatter: c => secsToTime(c.getValue())},
   ];
   const detailsKeys = ['Size', 'Added on', 'Uploaded', 'Time Active', 'Last activity'];
+  let daysObj = {};
+  for (let i = props.data.activity.length - 1; i >= 0; --i) {
+    const data = props.data.activity[i];
+    const date = new Date(data.timestamp * 1000);
+    const key = `${date.getFullYear()}-${zeroPad(date.getMonth())}-${zeroPad(date.getDate())}`;
+    if (daysObj.hasOwnProperty(key) === false) daysObj[key] = [];
+    daysObj[key].push(data);
+  }
+  let statsArray = [];
+  for (var day in daysObj) {
+    const items = daysObj[day];
+    const dayTotal = items[0].uploaded - items[items.length - 1].uploaded;
+    statsArray.push({
+      name: day,
+      uploaded: dayTotal,
+    });
+  }
+  statsArray[statsArray.length - 1].uploaded += daysObj[day][daysObj[day].length - 1].uploaded;
   return (
     <main className='activityViewContainer'>
       <header className='itemProps'>
