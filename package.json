@@ -14,7 +14,8 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.3",
-    "react-tabulator": "^0.13.2"
+    "react-tabulator": "^0.13.2",
+    "recharts": "^1.8.5"
   },
   "scripts": {
     "start": "react-scripts start",
