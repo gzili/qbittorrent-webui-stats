@@ -13,9 +13,9 @@ function zeroPad(x) {
   return (x >= 10) ? x : '0' + x;
 }
 
-function formatDate(cell) {
+function formatDate(unixSeconds) {
   // let shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  let date = new Date(cell.getValue() * 1000);
+  let date = new Date(unixSeconds * 1000);
   let dd = zeroPad(date.getDate());
   let MM = zeroPad(date.getMonth()+1);
   let yyyy = date.getFullYear();
@@ -26,19 +26,18 @@ function formatDate(cell) {
   return `${yyyy}-${MM}-${dd} ${hh}:${mm}:${ss}`;
 }
 
-function bytesToUnits(cell) {
-  let bytes = cell.getValue();
-  let units = ['bytes', 'KB', 'MB', 'GB'];
+function bytesToUnits(bytes) {
+  const units = ['bytes', 'KB', 'MB', 'GB'];
   let p = 0;
   while (Math.pow(1024, p) <= bytes) ++p;
   return (p > 0) ? `${parseFloat((bytes / Math.pow(1024, p - 1)).toFixed(2))} ${units[p - 1]}` : `${bytes} ${units[p]}`;
 }
 
-function secsToTime(cell, diffSecs) {
+function secsToTime(unixSecs, diffSecs) {
   const isDiff = Number.isInteger(diffSecs);
-  let secs = (isDiff) ? diffSecs - cell.getValue() : cell.getValue();
+  let secs = (isDiff) ? diffSecs - unixSecs: unixSecs;
 
-  if (secs <= 0) return 'Just now';
+  if (secs <= 0) return 'A moment ago';
 
   let s = secs % 60;
   secs = Math.floor(secs / 60);
@@ -83,11 +82,11 @@ class TorrentListView extends React.Component {
     ];
     this.columns = [
       {title: 'Name', field: 'name', widthGrow: 2, contextMenu: cellMenu},
-      {title: 'Size', field: 'size', formatter: bytesToUnits},
-      {title: 'Uploaded', field: 'lastChange.uploaded', formatter: bytesToUnits},
-      {title: 'Time Active', field: 'lastChange.time_active', formatter: secsToTime},
-      {title: 'Added on', field: 'added_on', formatter: formatDate},
-      {title: 'Last Activity', field: 'last_activity', formatter: secsToTime, formatterParams: this.props.currentSecs},
+      {title: 'Size', field: 'size', formatter: c => bytesToUnits(c.getValue())},
+      {title: 'Uploaded', field: 'lastChange.uploaded', formatter: c => bytesToUnits(c.getValue())},
+      {title: 'Time Active', field: 'lastChange.time_active', formatter: c => secsToTime(c.getValue())},
+      {title: 'Added on', field: 'added_on', formatter: c => formatDate(c.getValue())},
+      {title: 'Last Activity', field: 'last_activity', formatter: c =>  secsToTime(c.getValue(), this.props.currentSecs)},
     ];
   }
   render() {
@@ -113,9 +112,9 @@ function DetailsValue(props) {
 
 function TorrentActivityView(props) {
   const columns = [
-    {title: 'Time', field: 'timestamp', formatter: formatDate},
-    {title: 'Uploaded', field: 'uploaded', formatter: bytesToUnits},
-    {title: 'Time Active', field: 'time_active', formatter: secsToTime},
+    {title: 'Time', field: 'timestamp', formatter: c => formatDate(c.getValue())},
+    {title: 'Uploaded', field: 'uploaded', formatter: c => bytesToUnits(c.getValue())},
+    {title: 'Time Active', field: 'time_active', formatter: c => secsToTime(c.getValue())},
   ];
   const detailsKeys = ['Size', 'Added on', 'Uploaded', 'Time Active', 'Last activity'];
   return (
