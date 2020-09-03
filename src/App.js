@@ -9,7 +9,7 @@ import { ReactTabulator } from 'react-tabulator';
 import { FontAwesomeIcon as FAIcon } from '@fortawesome/react-fontawesome';
 import { faCircleNotch, faTrash, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
-import { ResponsiveContainer, BarChart, Bar, CartesianGrid, XAxis, YAxis, LabelList} from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, CartesianGrid, XAxis, YAxis, LabelList } from 'recharts';
 
 function zeroPad(x) {
   return (x >= 10) ? x : '0' + x;
@@ -76,14 +76,14 @@ class TorrentListView extends React.Component {
     const deleteIcon = ReactDOMServer.renderToStaticMarkup(
       <FAIcon className='contextMenuIcon' icon={faTrash} fixedWidth />
     );
-    const cellMenu = [
+    this.rowMenu = [
       {
         label: `${deleteIcon} Delete torrent`,
         action: props.onTorrentDelete,
       }
     ];
     this.columns = [
-      {title: 'Name', field: 'name', contextMenu: cellMenu},
+      {title: 'Name', field: 'name'},
       {title: 'Size', field: 'size', formatter: c => bytesToUnits(c.getValue())},
       {title: 'Uploaded', field: 'lastChange.uploaded', formatter: c => bytesToUnits(c.getValue())},
       {title: 'Time Active', field: 'lastChange.time_active', formatter: c => secsToTime(c.getValue())},
@@ -103,7 +103,8 @@ class TorrentListView extends React.Component {
           window.scroll(0, this.props.scrollY);
         }}
         options = {{
-          layout: 'fitDataFill'
+          layout: 'fitDataFill',
+          rowContextMenu: this.rowMenu,
         }}
         />
     );
@@ -134,7 +135,6 @@ function TorrentActivityView(props) {
   let count = 0;
 
   while (iterDate > addedDate && count < 10) {
-    console.log(iterDate);
     const day = `${iterDate.getFullYear()}-${zeroPad(iterDate.getMonth() + 1)}-${zeroPad(iterDate.getDate())}`;
     daysObj[day] = [];
     iterDate.setDate(iterDate.getDate() - 1);
@@ -236,8 +236,8 @@ class App extends React.Component {
       dir: sorters[0].dir,
     }];
   }
-  deleteTorrent(e, cell) {
-    const hash = cell.getRow().getData().hash;
+  deleteTorrent(e, row) {
+    const hash = row.getData().hash;
     fetch('/delete', {
       method: 'POST',
       body: hash,
