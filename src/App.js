@@ -9,7 +9,7 @@ import { ReactTabulator } from 'react-tabulator';
 import { FontAwesomeIcon as FAIcon } from '@fortawesome/react-fontawesome';
 import { faCircleNotch, faTrash, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, LabelList} from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, CartesianGrid, XAxis, YAxis, LabelList} from 'recharts';
 
 function zeroPad(x) {
   return (x >= 10) ? x : '0' + x;
@@ -123,7 +123,7 @@ function TorrentActivityView(props) {
   for (let i = props.data.activity.length - 1; i >= 0; --i) {
     const data = props.data.activity[i];
     const date = new Date(data.timestamp * 1000);
-    const key = `${date.getFullYear()}-${zeroPad(date.getMonth())}-${zeroPad(date.getDate())}`;
+    const key = `${date.getFullYear()}-${zeroPad(date.getMonth() + 1)}-${zeroPad(date.getDate())}`;
     if (daysObj.hasOwnProperty(key) === false) daysObj[key] = [];
     daysObj[key].push(data);
   }
@@ -136,7 +136,7 @@ function TorrentActivityView(props) {
       uploaded: dayTotal,
     });
   }
-  statsArray[statsArray.length - 1].uploaded += daysObj[day][daysObj[day].length - 1].uploaded;
+  // statsArray[statsArray.length - 1].uploaded += daysObj[day][daysObj[day].length - 1].uploaded;
   return (
     <main className='activityViewContainer'>
       <header className='itemProps'>
@@ -162,11 +162,12 @@ function TorrentActivityView(props) {
       <section className='activitySection'>
         <h2 className='activitySectionName'>Daily upload amount</h2>
         <ResponsiveContainer width='100%' height={500}>
-          <BarChart data={statsArray}>
-            <XAxis dataKey='date' />
-            <YAxis width={65} tickFormatter={ v => bytesToUnits(v) } />
-            <Bar dataKey='uploaded' fill='#4CAF50'>
-              <LabelList dataKey='uploaded' position='insideTop' formatter={v => bytesToUnits(v) } />
+          <BarChart data={statsArray} margin={{ top: 20 }}>
+            <CartesianGrid vertical={false} stroke='#ECEFF1' />
+            <XAxis dataKey='date' tickLine={false} tick={{ fill: '#90A4AE' }} axisLine={false} />
+            <YAxis width={80} tickLine={false} axisLine={false} tickFormatter={ v => bytesToUnits(v) } tick={{ fill: '#90A4AE' }} />
+            <Bar dataKey='uploaded' fill='#2979FF'>
+              <LabelList dataKey='uploaded' position='top' formatter={v => bytesToUnits(v) } fill='#90A4AE' />
             </Bar>
           </BarChart>
         </ResponsiveContainer>
