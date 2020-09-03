@@ -243,6 +243,7 @@ class App extends React.Component {
       body: hash,
     }).then(response => {
       if (response.ok) {
+        this.scrollY = window.scrollY;
         this.fetchData();
       }
     });
