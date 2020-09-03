@@ -157,7 +157,7 @@ function TorrentActivityView(props) {
   }
   statsArray.reverse();
 
-  if (addedDate > new Date(2020, 7, 16)) statsArray[0].uploaded += daysObj[day][0].uploaded;
+  // if (addedDate > new Date(2020, 7, 16)) statsArray[0].uploaded += daysObj[day][0].uploaded;
   return (
     <main className='activityViewContainer'>
       <header className='itemProps'>
