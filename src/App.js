@@ -83,7 +83,7 @@ class TorrentListView extends React.Component {
       }
     ];
     this.columns = [
-      {title: 'Name', field: 'name', widthGrow: 2, contextMenu: cellMenu},
+      {title: 'Name', field: 'name', contextMenu: cellMenu},
       {title: 'Size', field: 'size', formatter: c => bytesToUnits(c.getValue())},
       {title: 'Uploaded', field: 'lastChange.uploaded', formatter: c => bytesToUnits(c.getValue())},
       {title: 'Time Active', field: 'lastChange.time_active', formatter: c => secsToTime(c.getValue())},
@@ -96,12 +96,14 @@ class TorrentListView extends React.Component {
       <ReactTabulator
         data={this.props.data}
         columns={this.columns}
-        layout='fitData'
         initialSort={this.props.initialSort}
         dataSorted={this.props.onSort}
         rowClick={this.props.onRowClick}
         dataLoaded={() => {
           window.scroll(0, this.props.scrollY);
+        }}
+        options = {{
+          layout: 'fitDataFill'
         }}
         />
     );
@@ -154,7 +156,7 @@ function TorrentActivityView(props) {
     });
   }
   statsArray.reverse();
-  
+
   if (addedDate > new Date(2020, 7, 16)) statsArray[0].uploaded += daysObj[day][0].uploaded;
   return (
     <main className='activityViewContainer'>
