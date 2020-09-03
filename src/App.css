@@ -1,9 +1,11 @@
 :root {
   --grey200: #EEEEEE;
+  --bluegrey50: #ECEFF1;
+  --blueA400: #2979FF;
 }
 
 body {
-  background: var(--grey200);
+  background: var(--bluegrey50);
 }
 
 .mainViewContainer {
@@ -37,9 +39,9 @@ body {
 
 .itemHash {
   font-family: monospace;
-  color: #4CAF50;
+  color: var(--blueA400);
   display: inline-block;
-  background: var(--grey200);
+  background: var(--bluegrey50);
   padding: 0 5px;
   border-radius: 5px;
 }
@@ -69,7 +71,7 @@ body {
   height: 50px;
   border-radius: 50%;
   padding: 10px;
-  background: #4CAF50;
+  background: var(--blueA400);
   color: #fff;
   border: 0;
   outline: none;
