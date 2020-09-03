@@ -119,24 +119,43 @@ function TorrentActivityView(props) {
     {title: 'Time Active', field: 'time_active', formatter: c => secsToTime(c.getValue())},
   ];
   const detailsKeys = ['Size', 'Added on', 'Uploaded', 'Time Active', 'Last activity'];
+
+  const addedDate = new Date(props.data.added_on * 1000);
+
+  let iterDate = new Date();
+  iterDate.setHours(23);
+  iterDate.setMinutes(59);
+  iterDate.setSeconds(59);
+  iterDate.setMilliseconds(999);
+
   let daysObj = {};
-  for (let i = props.data.activity.length - 1; i >= 0; --i) {
-    const data = props.data.activity[i];
-    const date = new Date(data.timestamp * 1000);
-    const key = `${date.getFullYear()}-${zeroPad(date.getMonth() + 1)}-${zeroPad(date.getDate())}`;
-    if (daysObj.hasOwnProperty(key) === false) daysObj[key] = [];
-    daysObj[key].push(data);
+  let count = 0;
+
+  while (iterDate > addedDate && count < 10) {
+    console.log(iterDate);
+    const day = `${iterDate.getFullYear()}-${zeroPad(iterDate.getMonth() + 1)}-${zeroPad(iterDate.getDate())}`;
+    daysObj[day] = [];
+    iterDate.setDate(iterDate.getDate() - 1);
+    ++count;
   }
+  for (let item of props.data.activity) {
+    const date = new Date(item.timestamp * 1000);
+    const key = `${date.getFullYear()}-${zeroPad(date.getMonth() + 1)}-${zeroPad(date.getDate())}`;
+    if (daysObj.hasOwnProperty(key)) daysObj[key].push(item);
+  }
+
   let statsArray = [];
   for (var day in daysObj) {
     const items = daysObj[day];
-    const dayTotal = items[0].uploaded - items[items.length - 1].uploaded;
+    const dayTotal = (items.length === 0) ? 0 : items[items.length - 1].uploaded - items[0].uploaded;
     statsArray.push({
       date: day,
       uploaded: dayTotal,
     });
   }
-  // statsArray[statsArray.length - 1].uploaded += daysObj[day][daysObj[day].length - 1].uploaded;
+  statsArray.reverse();
+  
+  if (addedDate > new Date(2020, 7, 16)) statsArray[0].uploaded += daysObj[day][0].uploaded;
   return (
     <main className='activityViewContainer'>
       <header className='itemProps'>
@@ -165,7 +184,7 @@ function TorrentActivityView(props) {
           <BarChart data={statsArray} margin={{ top: 20 }}>
             <CartesianGrid vertical={false} stroke='#ECEFF1' />
             <XAxis dataKey='date' tickLine={false} tick={{ fill: '#90A4AE' }} axisLine={false} />
-            <YAxis width={80} tickLine={false} axisLine={false} tickFormatter={ v => bytesToUnits(v) } tick={{ fill: '#90A4AE' }} />
+            <YAxis width={90} tickLine={false} axisLine={false} tickFormatter={ v => bytesToUnits(v) } tick={{ fill: '#90A4AE' }} />
             <Bar dataKey='uploaded' fill='#2979FF'>
               <LabelList dataKey='uploaded' position='top' formatter={v => bytesToUnits(v) } fill='#90A4AE' />
             </Bar>
