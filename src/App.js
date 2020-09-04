@@ -147,6 +147,7 @@ function TorrentActivityView(props) {
   }
 
   let statsArray = [];
+  let last10Days = 0;
   for (var day in daysObj) {
     const items = daysObj[day];
     const dayTotal = (items.length === 0) ? 0 : items[items.length - 1].uploaded - items[0].uploaded;
@@ -154,6 +155,7 @@ function TorrentActivityView(props) {
       date: day,
       uploaded: dayTotal,
     });
+    last10Days += dayTotal;
   }
   statsArray.reverse();
 
@@ -174,14 +176,14 @@ function TorrentActivityView(props) {
           <div className='detailsColValues'>
             <DetailsValue>{bytesToUnits(props.data.size)}</DetailsValue>
             <DetailsValue>{formatDate(props.data.added_on)}</DetailsValue>
-            <DetailsValue>{bytesToUnits(props.data.lastChange.uploaded)}</DetailsValue>
+            <DetailsValue>{bytesToUnits(props.data.lastChange.uploaded) + ` (${bytesToUnits(last10Days)} in last 10 days)`}</DetailsValue>
             <DetailsValue>{secsToTime(props.data.lastChange.time_active)}</DetailsValue>
             <DetailsValue>{formatDate(props.data.last_activity)}</DetailsValue>
           </div>
         </div>
       </header>
       <section className='activitySection'>
-        <h2 className='activitySectionName'>Daily upload amount</h2>
+        <h2 className='activitySectionName'>Last 10 days</h2>
         <ResponsiveContainer width='100%' height={500}>
           <BarChart data={statsArray} margin={{ top: 20 }}>
             <CartesianGrid vertical={false} stroke='#ECEFF1' />
