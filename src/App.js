@@ -189,7 +189,7 @@ function TorrentActivityView(props) {
             <CartesianGrid vertical={false} stroke='#ECEFF1' />
             <XAxis dataKey='date' tickLine={false} tick={{ fill: '#90A4AE' }} axisLine={false} />
             <YAxis width={90} tickLine={false} axisLine={false} tickFormatter={ v => bytesToUnits(v) } tick={{ fill: '#90A4AE' }} />
-            <Bar dataKey='uploaded' fill='#2979FF'>
+            <Bar dataKey='uploaded' fill='#2979FF' radius={[5, 5, 0, 0]}>
               <LabelList dataKey='uploaded' position='top' formatter={v => bytesToUnits(v) } fill='#90A4AE' />
             </Bar>
           </BarChart>
