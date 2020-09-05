@@ -10,6 +10,7 @@ import { FontAwesomeIcon as FAIcon } from '@fortawesome/react-fontawesome';
 import { faCircleNotch, faTrash, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 import { ResponsiveContainer, BarChart, Bar, CartesianGrid, XAxis, YAxis, LabelList } from 'recharts';
+import moment from 'moment';
 
 function zeroPad(x) {
   return (x >= 10) ? x : '0' + x;
@@ -123,43 +124,51 @@ function TorrentActivityView(props) {
   ];
   const detailsKeys = ['Size', 'Added on', 'Uploaded', 'Time Active', 'Last activity'];
 
-  const addedDate = new Date(props.data.added_on * 1000);
-
-  let iterDate = new Date();
-  iterDate.setHours(23);
-  iterDate.setMinutes(59);
-  iterDate.setSeconds(59);
-  iterDate.setMilliseconds(999);
+  const addedDate = moment.unix(props.data.added_on);
+  let iterDate = moment();
 
   let daysObj = {};
-  let count = 0;
+  let days = [];
+  let dayCount = 0;
 
-  while (iterDate > addedDate && count < 10) {
-    const day = `${iterDate.getFullYear()}-${zeroPad(iterDate.getMonth() + 1)}-${zeroPad(iterDate.getDate())}`;
+  while (iterDate.isSameOrAfter(addedDate, 'day') && dayCount < 10) {
+    const day = iterDate.format('YYYY-MM-DD');
     daysObj[day] = [];
-    iterDate.setDate(iterDate.getDate() - 1);
-    ++count;
+    days.push(day);
+    ++dayCount;
+    iterDate.subtract(1, 'day');
   }
-  for (let item of props.data.activity) {
-    const date = new Date(item.timestamp * 1000);
-    const key = `${date.getFullYear()}-${zeroPad(date.getMonth() + 1)}-${zeroPad(date.getDate())}`;
+
+  for (let i = props.data.activity.length - 1; i >= 0; --i) {
+    const item = props.data.activity[i];
+    let itemDate = moment.unix(item.timestamp);
+    if (itemDate.hour() === 0 && itemDate.minute() === 0) itemDate.subtract(1, 'day');
+    const key = itemDate.format('YYYY-MM-DD');
     if (daysObj.hasOwnProperty(key)) daysObj[key].push(item);
+    else break;
   }
 
   let statsArray = [];
+  days.reverse();
+  let lastDayAmount = null;
   let last10Days = 0;
-  for (var day in daysObj) {
+  for (var day of days) {
     const items = daysObj[day];
-    const dayTotal = (items.length === 0) ? 0 : items[items.length - 1].uploaded - items[0].uploaded;
+    let dayTotal = 0;
+    if (items.length > 0) {
+      if (addedDate.format('YYYY-MM-DD') === day) dayTotal = items[0].uploaded;
+      else {
+        dayTotal = items[0].uploaded - items[items.length - 1].uploaded;
+        if (lastDayAmount !== null) dayTotal += items[items.length - 1].uploaded - lastDayAmount;
+      }
+      lastDayAmount = items[0].uploaded;
+    }
     statsArray.push({
       date: day,
       uploaded: dayTotal,
     });
     last10Days += dayTotal;
   }
-  statsArray.reverse();
-
-  // if (addedDate > new Date(2020, 7, 16)) statsArray[0].uploaded += daysObj[day][0].uploaded;
   return (
     <main className='activityViewContainer'>
       <header className='itemProps'>
