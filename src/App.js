@@ -14,10 +14,6 @@ import { ResponsiveContainer, BarChart, Bar, CartesianGrid, XAxis, YAxis, LabelL
 
 import './App.css';
 
-function zeroPad(x) {
-  return (x >= 10) ? x : '0' + x;
-}
-
 function formatDate(unixSecs) {
   return moment.unix(unixSecs).format('YYYY-MM-DD HH:mm:ss');
 }
