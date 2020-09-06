@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
-import './App.css';
+
+import moment from 'moment';
 
 import 'react-tabulator/css/tabulator_site.min.css';
 import 'react-tabulator/lib/styles.css';
@@ -10,14 +11,14 @@ import { FontAwesomeIcon as FAIcon } from '@fortawesome/react-fontawesome';
 import { faCircleNotch, faTrash, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 import { ResponsiveContainer, BarChart, Bar, CartesianGrid, XAxis, YAxis, LabelList } from 'recharts';
-import moment from 'moment';
+
+import './App.css';
 
 function zeroPad(x) {
   return (x >= 10) ? x : '0' + x;
 }
 
 function formatDate(unixSeconds) {
-  // let shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   let date = new Date(unixSeconds * 1000);
   let dd = zeroPad(date.getDate());
   let MM = zeroPad(date.getMonth()+1);
@@ -25,7 +26,6 @@ function formatDate(unixSeconds) {
   let hh = zeroPad(date.getHours());
   let mm = zeroPad(date.getMinutes());
   let ss = zeroPad(date.getSeconds());
-  // let shortMonth = shortMonths[date.getMonth()];
   return `${yyyy}-${MM}-${dd} ${hh}:${mm}:${ss}`;
 }
 
@@ -149,14 +149,15 @@ function TorrentActivityView(props) {
   }
 
   let statsArray = [];
-  days.reverse();
   let lastDayAmount = null;
   let last10Days = 0;
-  for (var day of days) {
+  days.reverse();
+  const addedDateKey = addedDate.format('YYYY-MM-DD');
+  for (let day of days) {
     const items = daysObj[day];
     let dayTotal = 0;
     if (items.length > 0) {
-      if (addedDate.format('YYYY-MM-DD') === day) dayTotal = items[0].uploaded;
+      if (addedDateKey === day) dayTotal = items[0].uploaded;
       else {
         dayTotal = items[0].uploaded - items[items.length - 1].uploaded;
         if (lastDayAmount !== null) dayTotal += items[items.length - 1].uploaded - lastDayAmount;
