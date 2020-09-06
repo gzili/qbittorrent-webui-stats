@@ -18,15 +18,8 @@ function zeroPad(x) {
   return (x >= 10) ? x : '0' + x;
 }
 
-function formatDate(unixSeconds) {
-  let date = new Date(unixSeconds * 1000);
-  let dd = zeroPad(date.getDate());
-  let MM = zeroPad(date.getMonth()+1);
-  let yyyy = date.getFullYear();
-  let hh = zeroPad(date.getHours());
-  let mm = zeroPad(date.getMinutes());
-  let ss = zeroPad(date.getSeconds());
-  return `${yyyy}-${MM}-${dd} ${hh}:${mm}:${ss}`;
+function formatDate(unixSecs) {
+  return moment.unix(unixSecs).format('YYYY-MM-DD HH:mm:ss');
 }
 
 function bytesToUnits(bytes) {
@@ -276,8 +269,7 @@ class App extends React.Component {
         for (let row of data) {
           row.lastChange = row.activity[row.activity.length - 1];
         }
-        const now = new Date();
-        this.currentSecs = Math.floor(new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), 0, 0).getTime() / 1000);
+        this.currentSecs = moment().minute(0).second(0).unix();
         this.setState({
           isLoaded: true,
           data: data,
