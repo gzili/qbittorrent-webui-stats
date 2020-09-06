@@ -185,7 +185,10 @@ function TorrentActivityView(props) {
           <div className='detailsColValues'>
             <DetailsValue>{bytesToUnits(props.data.size)}</DetailsValue>
             <DetailsValue>{formatDate(props.data.added_on)}</DetailsValue>
-            <DetailsValue>{bytesToUnits(props.data.lastChange.uploaded) + ` (${bytesToUnits(last10Days)} in last 10 days)`}</DetailsValue>
+            <DetailsValue>
+              {bytesToUnits(props.data.lastChange.uploaded)}
+              {last10Days !== props.data.lastChange.uploaded && ` (${bytesToUnits(last10Days)} in last 10 days)`}
+            </DetailsValue>
             <DetailsValue>{secsToTime(props.data.lastChange.time_active)}</DetailsValue>
             <DetailsValue>{formatDate(props.data.last_activity)}</DetailsValue>
           </div>
