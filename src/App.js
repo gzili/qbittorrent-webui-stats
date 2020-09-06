@@ -23,10 +23,10 @@ function formatDate(unixSecs) {
 }
 
 function bytesToUnits(bytes) {
-  const units = ['bytes', 'KB', 'MB', 'GB'];
+  const units = ['B', 'KB', 'MB', 'GB'];
   let p = 0;
   while (Math.pow(1024, p) <= bytes) ++p;
-  return (p > 0) ? `${parseFloat((bytes / Math.pow(1024, p - 1)).toFixed(2))} ${units[p - 1]}` : `${bytes} ${units[p]}`;
+  return (p > 0) ? `${parseFloat((bytes / Math.pow(1024, p - 1)).toFixed(2))} ${units[p - 1]}` : `${bytes} B`;
 }
 
 function secsToTime(unixSecs, diffSecs) {
