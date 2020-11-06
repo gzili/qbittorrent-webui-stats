@@ -19,7 +19,7 @@ function formatDate(unixSecs) {
 }
 
 function bytesToUnits(bytes) {
-  const units = ['B', 'KB', 'MB', 'GB'];
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
   let p = 0;
   while (Math.pow(1024, p) <= bytes) ++p;
   return (p > 0) ? `${parseFloat((bytes / Math.pow(1024, p - 1)).toFixed(2))} ${units[p - 1]}` : `${bytes} B`;
