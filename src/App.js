@@ -106,11 +106,6 @@ function DetailsValue(props) {
 }
 
 function TorrentActivityView(props) {
-  const columns = [
-    {title: 'Time', field: 'timestamp', formatter: c => formatDate(c.getValue())},
-    {title: 'Uploaded', field: 'uploaded', formatter: c => bytesToUnits(c.getValue())},
-    {title: 'Time Active', field: 'time_active', formatter: c => secsToTime(c.getValue())},
-  ];
   const detailsKeys = ['Size', 'Added on', 'Uploaded', 'Time Active', 'Last activity'];
 
   const addedDate = moment.unix(props.data.added_on);
@@ -196,17 +191,6 @@ function TorrentActivityView(props) {
             </Bar>
           </BarChart>
         </ResponsiveContainer>
-      </section>
-      <section className='activitySection'>
-        <h2 className='activitySectionName'>Hourly statistics entries</h2>
-        <ReactTabulator
-          data={props.data.activity}
-          columns={columns}
-          options={{
-            layout: 'fitDataStretch',
-            headerSort: false,
-          }}
-        />
       </section>
       <button className='returnButtonFloating' onClick={props.onReturn}>
         <FAIcon icon={faArrowLeft} />
