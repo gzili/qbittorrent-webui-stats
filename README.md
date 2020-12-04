@@ -28,7 +28,7 @@ After installation, `config.json` in the [server](server) directory should be re
 
 ## Usage
 - The Python script at [utils/main.py](utils/main.py) fetches current data for all torrents by making a request to [qBittorrent WebUI API](https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)) which should be running at localhost:8888. It is recommended to set up your favorite task scheduling utility (e. g. `cron` on Linux) to run the script hourly. The script accepts an optional `--working-dir` argument which can be used to override the directory where the database file is stored (normally it is the current working directory, however, the override is useful when the script is run by operating system utilities, such as `cron`)
-- The backend server is started by running `npm run server` from this project root directory (requires elevated privileges if run on privileged port `0-1024`)
+- The backend server is started by running `npm run server` from this project's root directory (requires elevated privileges if run on privileged port `0-1024`)
 - The frontend can be accessed at `localhost` from a WEB browser on a PC in your local network.
 
 ## Todos
@@ -36,6 +36,7 @@ After installation, `config.json` in the [server](server) directory should be re
 - [ ] Show the total upload amount of last 10 days in the main torrents table
 - [ ] Ability to change the maximum number of days displayed in the bar chart
 - [ ] Chart ticks at round data values instead of automatically calculated ones
+- [ ] Add a configuration option to change the port that the frontend server runs on
 
 ## Special thanks to creators of these awesome libraries
 - [React tabulator](https://github.com/ngduc/react-tabulator)
