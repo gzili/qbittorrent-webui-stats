@@ -18,3 +18,7 @@ Coming soon...
 - [ ] Show the total upload amount of last 10 days in the main torrents table
 - [ ] Ability to change the maximum number of days displayed in the bar chart
 - [ ] Chart ticks at round data values instead of automatically calculated ones
+
+## Special thanks to creators of these awesome libraries
+- [React tabulator](https://github.com/ngduc/react-tabulator)
+- [Recharts](https://github.com/recharts/recharts)
