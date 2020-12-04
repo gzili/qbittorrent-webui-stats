@@ -3,6 +3,12 @@ Utilities to collect and visualize statistical torrent activity data from [qBitt
 
 ![Individual torrent view demo](docs/demo-scr.png)
 
+## Motivation
+This project is meant help seeders who use [qbittorrent-nox](https://github.com/qbittorrent/qBittorrent) and seek an easier way of determining which torrents are the least active when it is time to free up disk space for newer torrents.
+
+## Disclaimer
+This is a quick project that I made for my own personal use, therefore it does not have a user-friendly installation and usage procedures. The utilities underwent only minimal testing.
+
 ## Features
 - Python script which collects torrent activity data into an SQLite database
 - ExpressJS powered lightweight server which handles transactions between frontend, database and qBittorrent API
