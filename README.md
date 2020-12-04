@@ -16,8 +16,20 @@ This is a quick project that I made for my own personal use, therefore it does n
 - Beautiful bar chart showing daily upload amounts of last 10 days for every torrent
 - Delete torrents from qBittorrent together with respective database entries straight from the frontend
 
+## Installation
+Requires `NodeJS`
+```
+git clone https://github.com/tw34kus/qbittorrent-webui-stats.git
+cd qbittorrent-webui-stats
+npm install
+npm run build
+```
+After installation, `config.json` in the [server](server) directory should be renamed to `config.local.json` and should include the correct path to the database file, relative to the project's root directory. In most cases, no modification of the file contents is needed.
+
 ## Usage
-Coming soon...
+- The Python script at [utils/main.py](utils/main.py) fetches current data for all torrents by making a request to (qBittorrent WebUI API)[https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)] which should be running at localhost:8888. It is recommended to set up your favorite task scheduling utility (e. g. `cron` on Linux) to run the script hourly. The script accepts an optional `--working-dir` argument which can be used to override the directory where the database file is stored (normally it is the current working directory, however, the override is useful when the script is run by operating system utilities, such as `cron`)
+- The backend server is started by running `npm run server` from this project root directory (requires elevated privileges if run on privileged port `0-1024`)
+- The frontend can be accessed at `localhost` from a WEB browser on a PC in your local network.
 
 ## Todos
 - [ ] Highlight the last selected torrent entry after returning from individual torrent view
