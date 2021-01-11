@@ -10,7 +10,7 @@ import { ReactTabulator } from 'react-tabulator';
 import { FontAwesomeIcon as FAIcon } from '@fortawesome/react-fontawesome';
 import { faCircleNotch, faTrash, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
-import { ResponsiveContainer, BarChart, Bar, CartesianGrid, XAxis, YAxis, LabelList } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, CartesianGrid, XAxis, YAxis, LabelList, Cell } from 'recharts';
 
 import './App.css';
 
@@ -60,6 +60,52 @@ function MainView(props) {
   );
 }
 
+function getUploadedBytesInLast10Days(data) {
+  const addedDate = moment.unix(data.added_on);
+  let iterDate = moment();
+
+  let daysObj = {};
+  let days = [];
+  let dayCount = 0;
+
+  while (iterDate.isSameOrAfter(addedDate, 'day') && dayCount < 10) {
+    const day = iterDate.format('YYYY-MM-DD');
+    daysObj[day] = [];
+    days.push(day);
+    ++dayCount;
+    iterDate.subtract(1, 'day');
+  }
+
+  for (let i = data.activity.length - 1; i >= 0; --i) {
+    const item = data.activity[i];
+    let itemDate = moment.unix(item.timestamp);
+    if (itemDate.hour() === 0 && itemDate.minute() === 0) itemDate.subtract(1, 'day');
+    const key = itemDate.format('YYYY-MM-DD');
+    if (daysObj.hasOwnProperty(key)) daysObj[key].push(item);
+    else break;
+  }
+
+  let lastDayAmount = null;
+  let last10Days = 0;
+  days.reverse();
+  const addedDateKey = addedDate.format('YYYY-MM-DD');
+  for (let day of days) {
+    const items = daysObj[day];
+    let dayTotal = 0;
+    if (items.length > 0) {
+      if (addedDateKey === day) dayTotal = items[0].uploaded;
+      else {
+        dayTotal = items[0].uploaded - items[items.length - 1].uploaded;
+        if (lastDayAmount !== null) dayTotal += items[items.length - 1].uploaded - lastDayAmount;
+      }
+      lastDayAmount = items[0].uploaded;
+    }
+    last10Days += dayTotal;
+  }
+
+  return last10Days;
+}
+
 class TorrentListView extends React.Component {
   constructor(props) {
     super(props);
@@ -76,6 +122,9 @@ class TorrentListView extends React.Component {
       {title: 'Name', field: 'name'},
       {title: 'Size', field: 'size', formatter: c => bytesToUnits(c.getValue())},
       {title: 'Uploaded', field: 'lastChange.uploaded', formatter: c => bytesToUnits(c.getValue())},
+      {title: 'Last 10 Days', field: 'last10Days', formatter: c => (
+        c.getData().last10Days !== c.getData().lastChange.uploaded ? bytesToUnits(c.getValue()) : `(${bytesToUnits(c.getValue())})`
+      )},
       {title: 'Time Active', field: 'lastChange.time_active', formatter: c => secsToTime(c.getValue())},
       {title: 'Added on', field: 'added_on', formatter: c => formatDate(c.getValue())},
       {title: 'Last Activity', field: 'last_activity', formatter: c =>  secsToTime(c.getValue(), this.props.currentSecs)},
@@ -248,6 +297,7 @@ class App extends React.Component {
       response.json().then(data => {
         for (let row of data) {
           row.lastChange = row.activity[row.activity.length - 1];
+          row.last10Days = getUploadedBytesInLast10Days(row);
         }
         this.currentSecs = moment().minute(0).second(0).unix();
         this.setState({
