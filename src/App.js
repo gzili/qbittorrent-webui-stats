@@ -122,9 +122,10 @@ class TorrentListView extends React.Component {
       {title: 'Name', field: 'name'},
       {title: 'Size', field: 'size', formatter: c => bytesToUnits(c.getValue())},
       {title: 'Uploaded', field: 'lastChange.uploaded', formatter: c => bytesToUnits(c.getValue())},
-      {title: 'Last 10 Days', field: 'last10Days', formatter: c => (
+      {title: '10 Days', field: 'last10Days.bytes', formatter: c => (
         c.getData().last10Days !== c.getData().lastChange.uploaded ? bytesToUnits(c.getValue()) : `(${bytesToUnits(c.getValue())})`
       )},
+      {title: '10 Days Ratio', field: 'last10Days.ratio'},
       {title: 'Time Active', field: 'lastChange.time_active', formatter: c => secsToTime(c.getValue())},
       {title: 'Added on', field: 'added_on', formatter: c => formatDate(c.getValue())},
       {title: 'Last Activity', field: 'last_activity', formatter: c =>  secsToTime(c.getValue(), this.props.currentSecs)},
@@ -297,7 +298,12 @@ class App extends React.Component {
       response.json().then(data => {
         for (let row of data) {
           row.lastChange = row.activity[row.activity.length - 1];
-          row.last10Days = getUploadedBytesInLast10Days(row);
+
+          let last10DaysBytes = getUploadedBytesInLast10Days(row);
+          row.last10Days = {
+            bytes: last10DaysBytes,
+            ratio: +(last10DaysBytes / row.size).toFixed(2),
+          };
         }
         this.currentSecs = moment().minute(0).second(0).unix();
         this.setState({
