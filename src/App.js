@@ -123,7 +123,7 @@ class TorrentListView extends React.Component {
       {title: 'Size', field: 'size', formatter: c => bytesToUnits(c.getValue())},
       {title: 'Uploaded', field: 'lastChange.uploaded', formatter: c => bytesToUnits(c.getValue())},
       {title: '10 Days', field: 'last10Days.bytes', formatter: c => (
-        c.getData().last10Days !== c.getData().lastChange.uploaded ? bytesToUnits(c.getValue()) : `(${bytesToUnits(c.getValue())})`
+        c.getData().last10Days.bytes !== c.getData().lastChange.uploaded ? bytesToUnits(c.getValue()) : `(${bytesToUnits(c.getValue())})`
       )},
       {title: '10 Days Ratio', field: 'last10Days.ratio'},
       {title: 'Time Active', field: 'lastChange.time_active', formatter: c => secsToTime(c.getValue())},
