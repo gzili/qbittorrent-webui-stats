@@ -49,17 +49,6 @@ function secsToTime(unixSecs, diffSecs) {
   return str;
 }
 
-function MainView(props) {
-  return (
-    <div className='mainViewContainer'>
-      <div className='loadingIcon'>
-        <FAIcon icon={faCircleNotch} spin />
-      </div>
-      <div className='loadingText'>Fetching data</div>
-    </div>
-  );
-}
-
 function getUploadedBytesInLast10Days(data) {
   const addedDate = moment.unix(data.added_on);
   let iterDate = moment();
@@ -104,6 +93,17 @@ function getUploadedBytesInLast10Days(data) {
   }
 
   return last10Days;
+}
+
+function LoadingView() {
+  return (
+    <div className='mainViewContainer'>
+      <div className='loadingIcon'>
+        <FAIcon icon={faCircleNotch} spin />
+      </div>
+      <div className='loadingText'>Fetching data</div>
+    </div>
+  );
 }
 
 class TorrentListView extends React.Component {
@@ -341,7 +341,7 @@ class App extends React.Component {
       }
     }
     else {
-      return <MainView />;
+      return <LoadingView />;
     }
   }
 }
