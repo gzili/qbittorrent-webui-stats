@@ -1,12 +1,12 @@
-const express = require('express')
-const app = express()
-const port = (process.env.NODE_ENV === 'production') ? 80 : 3001;
-
 const http = require('http');
+const express = require('express');
 
 const config = require('./config.local.json');
 
 const db = require('better-sqlite3')(config.dbFile, {fileMustExist: true});
+
+const app = express();
+const port = (process.env.NODE_ENV === 'production') ? 80 : 3001;
 
 app.use(express.static('build'));
 
@@ -18,7 +18,11 @@ app.get('/stats', (req, res) => {
     item.activity = db.prepare('SELECT * FROM activity WHERE hash = ?').all(item.hash);
   }
   res.json(items);
-})
+});
+
+app.get('/disks', (req, res) => {
+  ;
+});
 
 app.post('/delete', (req, res) => {
   const hash = req.body;
@@ -35,8 +39,8 @@ app.post('/delete', (req, res) => {
       res.end();
     });
   });
-})
+});
 
 app.listen(port, () => {
   console.log(`API server listening at http://localhost:${port}`)
-})
+});
