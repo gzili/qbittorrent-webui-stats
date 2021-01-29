@@ -116,18 +116,18 @@ function LoadingView() {
 }
 
 function DiskItem(props) {
-  let { size, free } = props.stats;
+  let { size, used, free } = props.stats;
 
   return (
     <div className='diskItemBox'>
       <div className='diskName'>{props.stats.file}</div>
       <div className='diskUsageBar'>
         <div className='diskUsageBarOuter'>
-          <div className='diskUsageBarInner' style={{width: `${((size - free) / size) * 100}%`}}></div>
+          <div className='diskUsageBarInner' style={{width: `${(used / size) * 100}%`}}></div>
         </div>
       </div>
       <div className='diskUsageText'>
-        {`${bytesToUnits(size - free)} of ${bytesToUnits(size)} used (${bytesToUnits(free)} available)`}
+        {`${bytesToUnits(used)} of ${bytesToUnits(size)} used (${bytesToUnits(free)} available)`}
       </div>
     </div>
   );
