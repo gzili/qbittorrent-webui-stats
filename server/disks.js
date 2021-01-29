@@ -1,9 +1,7 @@
 const { promisify } = require('util');
 const exec = promisify(require('child_process').exec);
 
-const config = require('./config.local.json');
-
-async function getDiskUsage(disks) {
+export async function getDiskUsage(disks) {
 
   const diskFiles = disks.map(disk => disk.file);
 
@@ -25,5 +23,3 @@ async function getDiskUsage(disks) {
 
   return diskStats;
 }
-
-getDiskUsage(config.disks).then(diskStats => console.log(diskStats));
