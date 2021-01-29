@@ -1,6 +1,8 @@
 const http = require('http');
 const express = require('express');
 
+const { getDiskUsage } = require('./disks');
+
 const config = require('./config.local.json');
 
 const db = require('better-sqlite3')(config.dbFile, {fileMustExist: true});
@@ -21,7 +23,9 @@ app.get('/stats', (req, res) => {
 });
 
 app.get('/disks', (req, res) => {
-  ;
+  getDiskUsage(config.disks).then(diskStats => {
+    res.json(diskStats);
+  });
 });
 
 app.post('/delete', (req, res) => {
