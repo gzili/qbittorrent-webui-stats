@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactDOMServer from 'react-dom/server';
 
 import moment from 'moment';
@@ -95,6 +95,15 @@ function getUploadedBytesInLast10Days(data) {
   return last10Days;
 }
 
+function ListViewSection(props) {
+  return (
+    <section className='listViewSection'>
+      <h1 className='listViewSectionHeader'>{props.title}</h1>
+      <div className='listViewSectionContent'>{props.children}</div>
+    </section>
+  );
+}
+
 function LoadingView() {
   return (
     <div className='mainViewContainer'>
@@ -103,6 +112,55 @@ function LoadingView() {
       </div>
       <div className='loadingText'>Fetching data</div>
     </div>
+  );
+}
+
+function DiskItem(props) {
+  let { size, free } = props.stats;
+
+  return (
+    <div className='diskItemBox'>
+      <div className='diskName'>{props.stats.file}</div>
+      <div className='diskUsageBar'>
+        <div className='diskUsageBarOuter'>
+          <div className='diskUsageBarInner' style={{width: `${((size - free) / size) * 100}%`}}></div>
+        </div>
+      </div>
+      <div className='diskUsageText'>
+        {`${bytesToUnits(size - free)} of ${bytesToUnits(size)} used (${bytesToUnits(free)} available)`}
+      </div>
+    </div>
+  );
+}
+
+function DiskUsageSection() {
+  const [diskStats, setDiskStats] = useState(null);
+
+  useEffect(() => {
+    if (diskStats === null) {
+      fetch('/disks', {
+        cache: 'no-store',
+      }).then(response => (
+        response.json().then(data => (
+          setDiskStats(data)
+        ))
+      ));
+    }
+  }, [diskStats]);
+
+  let diskItems = null;
+  if (diskStats !== null) {
+    diskItems = diskStats.map(disk => (
+      <DiskItem key={disk.file} stats={disk} />
+    ));
+  }
+
+  return (
+    <ListViewSection title='Disk Usage'>
+      <div className='diskItemsGrid'>
+        {diskItems}
+      </div>
+    </ListViewSection>
   );
 }
 
@@ -133,20 +191,25 @@ class TorrentListView extends React.Component {
   }
   render() {
     return (
-      <ReactTabulator
-        data={this.props.data}
-        columns={this.columns}
-        initialSort={this.props.initialSort}
-        dataSorted={this.props.onSort}
-        rowClick={this.props.onRowClick}
-        dataLoaded={() => {
-          window.scroll(0, this.props.scrollY);
-        }}
-        options = {{
-          layout: 'fitDataFill',
-          rowContextMenu: this.rowMenu,
-        }}
-        />
+      <div className='appContainer'>
+        <DiskUsageSection />
+        <ListViewSection title='All Torrents'>
+          <ReactTabulator
+            data={this.props.data}
+            columns={this.columns}
+            initialSort={this.props.initialSort}
+            dataSorted={this.props.onSort}
+            rowClick={this.props.onRowClick}
+            dataLoaded={() => {
+              window.scroll(0, this.props.scrollY);
+            }}
+            options = {{
+              layout: 'fitDataTable',
+              rowContextMenu: this.rowMenu,
+            }}
+          />
+        </ListViewSection>
+      </div>
     );
   }
 }

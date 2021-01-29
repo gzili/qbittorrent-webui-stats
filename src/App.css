@@ -16,6 +16,67 @@ body {
   align-items: center;
 }
 
+.appContainer {
+  padding: 0 25px 25px 25px;
+}
+
+.listViewSection {
+  padding-top: 10px;
+}
+
+.listViewSectionHeader {
+  margin: 0;
+  padding-bottom: 5px;
+}
+
+.listViewSectionContent {
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.diskItemsGrid {
+  display: flex;
+}
+
+.diskItemBox {
+  width: 20%;
+  margin-right: 10px;
+  background: #fff;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.diskName {
+  font-weight: bold;
+}
+
+.diskUsageBar {
+  padding: 5px 0;
+}
+
+.diskUsageBarOuter {
+  position: relative;
+  width: 100%;
+  height: 20px;
+  background: #82B1FF;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.diskUsageBarInner {
+  position: absolute;
+  height: 100%;
+  background: var(--blueA400);
+}
+
+.diskUsageText {
+  font-size: 14px;
+}
+
+.tabulator {
+  border-radius: 5px;
+}
+
 .contextMenuIcon {
   padding-right: 2px;
 }
