@@ -10,9 +10,8 @@ async function getDiskUsage(disks) {
   const diskStats = stdout.split('\n').slice(1, -1).map(line => {
     let [file, used, avail] = line.split(/\s+/);
 
-    // implicit conversion to number seems to be the fastest
-    used = +used;
-    avail = +avail;
+    used *= 1024;
+    avail *= 1024;
 
     return ({
       file: file,
