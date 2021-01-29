@@ -1,7 +1,7 @@
 const { promisify } = require('util');
 const exec = promisify(require('child_process').exec);
 
-export async function getDiskUsage(disks) {
+async function getDiskUsage(disks) {
 
   const diskFiles = disks.map(disk => disk.file);
 
@@ -23,3 +23,5 @@ export async function getDiskUsage(disks) {
 
   return diskStats;
 }
+
+exports.getDiskUsage = getDiskUsage;
