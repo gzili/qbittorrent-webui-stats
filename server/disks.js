@@ -17,6 +17,7 @@ async function getDiskUsage(disks) {
     return ({
       file: file,
       size: used + avail,
+      used: used,
       free: avail,
     });
   });
