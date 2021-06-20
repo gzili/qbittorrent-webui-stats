@@ -14,9 +14,9 @@
     "moment": "^2.29.1",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
-    "react-scripts": "3.4.3",
-    "react-tabulator": "^0.13.8",
-    "recharts": "^1.8.5"
+    "react-scripts": "4.0.3",
+    "react-tabulator": "^0.15.0",
+    "recharts": "^2.0.9"
   },
   "scripts": {
     "start": "react-scripts start",
