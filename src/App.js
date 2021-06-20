@@ -156,11 +156,16 @@ function DiskUsageSection() {
   }
 
   return (
-    <ListViewSection title='Disk Usage'>
-      <div className='diskItemsGrid'>
-        {diskItems}
+    //<ListViewSection title='Disk Usage'>
+    <section className='listViewSection' style={{ flexShrink: 0 }}>
+      <h1 className='listViewSectionHeader'>Disk Usage</h1>
+      <div className='sectionContent'>
+        <div className='diskItemsGrid'>
+          {diskItems}
+        </div>
       </div>
-    </ListViewSection>
+    </section>
+    //</ListViewSection>
   );
 }
 
@@ -193,22 +198,27 @@ class TorrentListView extends React.Component {
     return (
       <div className='appContainer'>
         <DiskUsageSection />
-        <ListViewSection title='All Torrents'>
-          <ReactTabulator
-            data={this.props.data}
-            columns={this.columns}
-            initialSort={this.props.initialSort}
-            dataSorted={this.props.onSort}
-            rowClick={this.props.onRowClick}
-            dataLoaded={() => {
-              window.scroll(0, this.props.scrollY);
-            }}
-            options = {{
-              layout: 'fitDataTable',
-              rowContextMenu: this.rowMenu,
-            }}
-          />
-        </ListViewSection>
+        {/*<ListViewSection title='All Torrents'>*/}
+        <section className='listViewSection mainSection'>
+          <h1 className='listViewSectionHeader'>Torrents</h1>
+          <div className='sectionContent'>
+            <ReactTabulator
+              data={this.props.data}
+              columns={this.columns}
+              initialSort={this.props.initialSort}
+              dataSorted={this.props.onSort}
+              rowClick={this.props.onRowClick}
+              dataLoaded={() => {
+                window.scroll(0, this.props.scrollY);
+              }}
+              options = {{
+                layout: 'fitDataTable',
+                rowContextMenu: this.rowMenu,
+              }}
+            />
+          </div>
+        </section>
+        {/*</ListViewSection>*/}
       </div>
     );
   }

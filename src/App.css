@@ -17,11 +17,23 @@ body {
 }
 
 .appContainer {
+  position: fixed;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
   padding: 0 25px 25px 25px;
 }
 
 .listViewSection {
   padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: hidden;
+}
+
+.mainSection {
+  flex-grow: 1;
 }
 
 .listViewSectionHeader {
@@ -32,6 +44,11 @@ body {
 .listViewSectionContent {
   border-radius: 5px;
   overflow: hidden;
+}
+
+.mainSection .sectionContent {
+  flex-grow: 1;
+  overflow-y: auto;
 }
 
 .diskItemsGrid {
