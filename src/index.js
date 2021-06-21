@@ -6,10 +6,17 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 
 const theme = extendTheme({
-  typography: {
+  styles: {
+    global: {
+      body: {
+        bg: 'gray.100',
+      },
+    },
+  },
+  fonts: {
     body: '"Inter", sans-serif',
     heading: '"Inter", sans-serif',
-  },
+  }
 });
 
 ReactDOM.render(
