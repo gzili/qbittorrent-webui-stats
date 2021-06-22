@@ -8,7 +8,7 @@ const config = require('./config.local.json');
 const db = require('better-sqlite3')(config.dbFile, {fileMustExist: true});
 
 const app = express();
-const port = (process.env.NODE_ENV === 'production') ? 80 : 3001;
+const port = (process.env.NODE_ENV === 'production') ? 3000 : 3001;
 
 app.use(express.static('build'));
 
@@ -30,8 +30,6 @@ app.get('/disks', (req, res) => {
 
 app.post('/delete', (req, res) => {
   const hash = req.body;
-  console.log(hash);
-  setTimeout(() => res.send(hash), 1000);
   const url = `http://localhost:8888/api/v2/torrents/delete?hashes=${hash}&deleteFiles=true`;
 
   http.get(url, qbRes => {
