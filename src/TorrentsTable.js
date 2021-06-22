@@ -1,16 +1,25 @@
 import React, { useRef, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import TableSortLabel from '@material-ui/core/TableSortLabel';
-import IconButton from '@material-ui/core/IconButton';
-import DeleteIcon from '@material-ui/icons/Delete';
+
 import moment from 'moment';
+
+import { makeStyles } from '@material-ui/core/styles';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TableSortLabel,
+  IconButton,
+  Select,
+  MenuItem
+} from '@material-ui/core';
+import DeleteIcon from '@material-ui/icons/Delete';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+
 import {
   AlertDialog,
   AlertDialogBody,
@@ -19,7 +28,13 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
   Button,
+  Text,
+  Heading,
+  Box,
+  Flex,
 } from '@chakra-ui/react';
+
+import { ResponsiveContainer, BarChart, Bar, CartesianGrid, XAxis, YAxis, LabelList } from 'recharts';
 
 const deleteTorrent = hash => {
   return new Promise((resolve, reject) => {
@@ -65,52 +80,6 @@ function secsToTime(unixSecs, diffSecs) {
   return str;
 }
 
-/*function getUploadedBytesInLast10Days(data) {
-  const addedDate = moment.unix(data.added_on);
-  let iterDate = moment();
-
-  let daysObj = {};
-  let days = [];
-  let dayCount = 0;
-
-  while (iterDate.isSameOrAfter(addedDate, 'day') && dayCount < 10) {
-    const day = iterDate.format('YYYY-MM-DD');
-    daysObj[day] = [];
-    days.push(day);
-    ++dayCount;
-    iterDate.subtract(1, 'day');
-  }
-
-  for (let i = data.activity.length - 1; i >= 0; --i) {
-    const item = data.activity[i];
-    let itemDate = moment.unix(item.timestamp);
-    if (itemDate.hour() === 0 && itemDate.minute() === 0) itemDate.subtract(1, 'day');
-    const key = itemDate.format('YYYY-MM-DD');
-    if (daysObj.hasOwnProperty(key)) daysObj[key].push(item);
-    else break;
-  }
-
-  let lastDayAmount = null;
-  let last10Days = 0;
-  days.reverse();
-  const addedDateKey = addedDate.format('YYYY-MM-DD');
-  for (let day of days) {
-    const items = daysObj[day];
-    let dayTotal = 0;
-    if (items.length > 0) {
-      if (addedDateKey === day) dayTotal = items[0].uploaded;
-      else {
-        dayTotal = items[0].uploaded - items[items.length - 1].uploaded;
-        if (lastDayAmount !== null) dayTotal += items[items.length - 1].uploaded - lastDayAmount;
-      }
-      lastDayAmount = items[0].uploaded;
-    }
-    last10Days += dayTotal;
-  }
-
-  return last10Days;
-}*/
-
 function descendingComparator(a, b, orderBy) {
   let lval = a;
   let rval = b;
@@ -143,7 +112,7 @@ function stableSort(array, comparator) {
     if (order !== 0) return order;
     return a[1] - b[1];
   });
-  return stabilizedThis.map((el) => el[0]);
+  return stabilizedThis.map(el => el[0]);
 }
 
 const DeleteDialog = props => {
@@ -185,29 +154,53 @@ const DeleteDialog = props => {
   );
 }
 
+const useRowStyles = makeStyles({
+  root: {
+    '& > *': {
+      borderBottom: 'unset',
+    },
+  },
+  leftCell: {
+    paddingLeft: 0,
+  },
+  rightCell: {
+    paddingRight: 0,
+  },
+  iconCell: {
+    padding: '0 8px !important',
+  },
+  icon: {
+    fontSize: 20,
+  },
+});
+
 const headCells = [
-  { id: 'name', numeric: false, label: 'Name' },
+  { id: 'name', numeric: false, cls: 'leftCell', label: 'Name' },
   { id: 'size', numeric: true, label: 'Size' },
   { id: 'lastChange.uploaded', numeric: true, label: 'Uploaded' },
   { id: 'last10Days.bytes', numeric: true, label: '10 Days' },
   { id: 'last10Days.ratio', numeric: true, label: '10 Days Ratio' },
   { id: 'lastChange.time_active', numeric: true, label: 'Time Active'},
-  { id: 'added_on', numeric: true, label: 'Added On'},
-  { id: 'last_activity', numeric: true, label: 'Last Activity'}
+  { id: 'last_activity', numeric: true, label: 'Last Activity'},
+  { id: 'added_on', numeric: true, cls: 'rightCell', label: 'Added on'},
 ];
 
 function EnhancedTableHead(props) {
   const { order, orderBy, onRequestSort } = props;
   const createSortHandler = (property) => () => onRequestSort(property);
 
+  const classes = useRowStyles();
+
   return (
     <TableHead>
       <TableRow>
-        {headCells.map((headCell) => (
+        <TableCell />
+        {headCells.map(headCell => (
           <TableCell
             key={headCell.id}
             align={headCell.numeric ? 'right' : 'left'}
             sortDirection={orderBy === headCell.id ? order : false}
+            className={classes[headCell.cls]}
           >
             <TableSortLabel
               active={orderBy === headCell.id}
@@ -230,7 +223,132 @@ EnhancedTableHead.propTypes = {
   orderBy: PropTypes.string.isRequired,
 };
 
-const useStyles = makeStyles((theme) => ({
+const ActivityChart = props => {
+  const { row } = props;
+
+  const [daysToShow, setDaysToShow] = useState(10);
+
+  const handleChange = e => {
+    setDaysToShow(e.target.value);
+  }
+
+  const addedDate = moment.unix(row.added_on);
+  let iterDate = moment();
+
+  let daysObj = {};
+  let days = [];
+  let dayCount = 0;
+
+  while (iterDate.isSameOrAfter(addedDate, 'day') && dayCount < daysToShow) {
+    const day = iterDate.format('YYYY-MM-DD');
+    daysObj[day] = [];
+    days.push(day);
+    ++dayCount;
+    iterDate.subtract(1, 'day');
+  }
+
+  for (let i = row.activity.length - 1; i >= 0; --i) {
+    const item = row.activity[i];
+    let itemDate = moment.unix(item.timestamp);
+    if (itemDate.hour() === 0 && itemDate.minute() === 0) itemDate.subtract(1, 'day');
+    const key = itemDate.format('YYYY-MM-DD');
+    if (daysObj.hasOwnProperty(key)) daysObj[key].push(item);
+    else break;
+  }
+
+  let statsArray = [];
+  let lastDayAmount = null;
+  let total = 0;
+  days.reverse();
+  const addedDateKey = addedDate.format('YYYY-MM-DD');
+  for (let day of days) {
+    const items = daysObj[day];
+    let dayTotal = 0;
+    if (items.length > 0) {
+      if (addedDateKey === day) dayTotal = items[0].uploaded;
+      else {
+        dayTotal = items[0].uploaded - items[items.length - 1].uploaded;
+        if (lastDayAmount !== null) dayTotal += items[items.length - 1].uploaded - lastDayAmount;
+      }
+      lastDayAmount = items[0].uploaded;
+    }
+    statsArray.push({
+      date: day,
+      uploaded: dayTotal,
+    });
+    total += dayTotal;
+  }
+
+  return (
+    <Box p={4}>
+      <Flex justify='space-between' align='center'>
+        <Heading as='h2' fontSize='xl' mb={2}>Activity in last {daysToShow} days ({formatBytes(total)} total)</Heading>
+        <Flex align='center'>
+          <Text mr={2}>Days to show:</Text>
+          <Select value={daysToShow} onChange={handleChange}>
+            <MenuItem value={7}>7</MenuItem>
+            <MenuItem value={10}>10</MenuItem>
+            <MenuItem value={30}>30</MenuItem>
+          </Select>
+        </Flex>
+      </Flex>
+      <ResponsiveContainer width='100%' height={400}>
+        <BarChart data={statsArray} margin={{ top: 20 }}>
+          <CartesianGrid vertical={false} stroke='#ECEFF1' />
+          <XAxis dataKey='date' tickLine={false} tick={{ fill: '#90A4AE' }} axisLine={false} />
+          <YAxis width={90} tickLine={false} axisLine={false} tickFormatter={ v => formatBytes(v) } tick={{ fill: '#90A4AE' }} />
+          <Bar dataKey='uploaded' fill='#2979FF' radius={[5, 5, 0, 0]} isAnimationActive={false}>
+            <LabelList dataKey='uploaded' position='top' formatter={v => formatBytes(v) } fill='#90A4AE' />
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </Box>
+  );
+}
+
+const ExpandableTableRow = props => {
+  const {
+    row,
+    timestamp,
+    setTargetItem,
+  } = props;
+
+  const [open, setOpen] = React.useState(false);
+
+  const classes = useRowStyles();
+
+  return (
+    <>
+      <TableRow className={classes.root} hover>
+        <TableCell className={classes.iconCell}>
+          <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+            {open ? <KeyboardArrowUpIcon className={classes.icon} /> : <KeyboardArrowDownIcon className={classes.icon} />}
+          </IconButton>
+        </TableCell>
+        <TableCell className={classes.leftCell}>{row.name}</TableCell>
+        <TableCell align="right">{formatBytes(row.size)}</TableCell>
+        <TableCell align="right">{formatBytes(row.lastChange.uploaded)}</TableCell>
+        <TableCell align="right">{formatBytes(row.last10Days.bytes)}</TableCell>
+        <TableCell align="right">{row.last10Days.ratio}</TableCell>
+        <TableCell align="right">{secsToTime(row.lastChange.time_active)}</TableCell>
+        <TableCell align="right">{secsToTime(row.last_activity, timestamp)}</TableCell>
+        <TableCell align="right" className={classes.rightCell}>{formatDate(row.added_on)}</TableCell>
+        <TableCell align="right" className={classes.iconCell}>
+          <IconButton size='small' onClick={() => setTargetItem(row)}>
+            <DeleteIcon className={classes.icon} />
+          </IconButton>
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell padding='none' colSpan={headCells.length + 2}>
+          { open && <ActivityChart row={row} /> }
+        </TableCell>
+      </TableRow>
+    </>
+  );
+}
+
+const useTableStyles = makeStyles((theme) => ({
   tableContainer: {
     position: 'absolute',
     top: 0,
@@ -254,12 +372,13 @@ export default function TorrentsTable(props) {
     rows
   } = data;
 
-  const classes = useStyles();
+  const classes = useTableStyles();
+
   const [order, setOrder] = React.useState('desc');
   const [orderBy, setOrderBy] = React.useState('added_on');
 
   const handleRequestSort = property => {
-    const isAsc = orderBy === property && order === 'asc';
+    const isAsc = (orderBy === property) && (order === 'asc');
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
@@ -272,7 +391,7 @@ export default function TorrentsTable(props) {
   const onDelete = useCallback(() => {
     setDeletePending(true);
 
-    deleteTorrent(targetItem.hash).then((success) => {
+    deleteTorrent(targetItem.hash).then(() => {
       closeDeleteDialog();
     }).finally(() => {
       setTargetItem(null);
@@ -293,23 +412,9 @@ export default function TorrentsTable(props) {
           <TableBody>
             {stableSort(rows, getComparator(order, orderBy))
               .map(row => (
-                  <TableRow key={row.hash} hover>
-                    <TableCell>{row.name}</TableCell>
-                    <TableCell align="right">{formatBytes(row.size)}</TableCell>
-                    <TableCell align="right">{formatBytes(row.lastChange.uploaded)}</TableCell>
-                    <TableCell align="right">{formatBytes(row.last10Days.bytes)}</TableCell>
-                    <TableCell align="right">{row.last10Days.ratio}</TableCell>
-                    <TableCell align="right">{secsToTime(row.lastChange.time_active)}</TableCell>
-                    <TableCell align="right">{formatDate(row.added_on)}</TableCell>
-                    <TableCell align="right">{secsToTime(row.last_activity, timestamp)}</TableCell>
-                    <TableCell align="right">
-                      <IconButton size='small' onClick={() => setTargetItem(row)}>
-                        <DeleteIcon fontSize='inherit' />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                )
-              )}
+                <ExpandableTableRow key={row.hash} row={row} timestamp={timestamp} setTargetItem={setTargetItem} />
+              )
+            )}
           </TableBody>
         </Table>
       </TableContainer>
