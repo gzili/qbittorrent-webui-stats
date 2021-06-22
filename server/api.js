@@ -17,7 +17,7 @@ app.use('/delete', express.text());
 app.get('/stats', (req, res) => {
   const items = db.prepare('SELECT * FROM torrents').all();
   for (let item of items) {
-    item.activity = db.prepare('SELECT * FROM activity WHERE hash = ?').all(item.hash);
+    item.activity = db.prepare('SELECT timestamp,uploaded,time_active FROM activity WHERE hash = ?').all(item.hash);
   }
   res.json(items);
 });
@@ -30,6 +30,8 @@ app.get('/disks', (req, res) => {
 
 app.post('/delete', (req, res) => {
   const hash = req.body;
+  console.log(hash);
+  setTimeout(() => res.send(hash), 1000);
   const url = `http://localhost:8888/api/v2/torrents/delete?hashes=${hash}&deleteFiles=true`;
 
   http.get(url, qbRes => {
