@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -11,6 +11,24 @@ import TableSortLabel from '@material-ui/core/TableSortLabel';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import moment from 'moment';
+import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+  Button,
+} from '@chakra-ui/react';
+
+const deleteTorrent = hash => {
+  return new Promise((resolve, reject) => {
+    fetch('/delete', {
+      method: 'POST',
+      body: hash,
+    }).then(() => resolve());
+  });
+}
 
 function formatDate(unixSecs) {
   return moment.unix(unixSecs).format('YYYY-MM-DD HH:mm:ss');
@@ -128,6 +146,45 @@ function stableSort(array, comparator) {
   return stabilizedThis.map((el) => el[0]);
 }
 
+const DeleteDialog = props => {
+  const {
+    isOpen,
+    onClose,
+    onConfirm,
+    itemName,
+    isPending
+  } = props;
+
+  const initialFocusRef = useRef();
+
+  return (
+    <AlertDialog
+      isOpen={isOpen}
+      leastDestructiveRef={initialFocusRef}
+      onClose={onClose}
+      closeOnEsc={!isPending}
+      closeOnOverlayClick={!isPending}
+      returnFocusOnClose={false}
+      isCentered
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+              Delete Torrent
+            </AlertDialogHeader>
+            <AlertDialogBody>
+              Delete <b>{itemName}</b>?
+            </AlertDialogBody>
+            <AlertDialogFooter>
+              <Button onClick={onClose} isDisabled={isPending}>Cancel</Button>
+              <Button colorScheme='red' ml={3} ref={initialFocusRef} onClick={onConfirm} isLoading={isPending}>Delete</Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
+  );
+}
+
 const headCells = [
   { id: 'name', numeric: false, label: 'Name' },
   { id: 'size', numeric: true, label: 'Size' },
@@ -188,7 +245,8 @@ const useStyles = makeStyles((theme) => ({
 
 export default function TorrentsTable(props) {
   const {
-    data
+    data,
+    refresh
   } = props;
 
   const {
@@ -206,36 +264,62 @@ export default function TorrentsTable(props) {
     setOrderBy(property);
   };
 
+  const [targetItem, setTargetItem] = useState(null);
+  const [isDeletePending, setDeletePending] = useState(false);
+
+  const closeDeleteDialog = () => setTargetItem(null);
+
+  const onDelete = useCallback(() => {
+    setDeletePending(true);
+
+    deleteTorrent(targetItem.hash).then((success) => {
+      closeDeleteDialog();
+    }).finally(() => {
+      setTargetItem(null);
+      setDeletePending(false);
+      refresh();
+    });
+  }, [targetItem, refresh]);
+
   return (
-    <TableContainer className={classes.tableContainer}>
-      <Table size='small' stickyHeader>
-        <EnhancedTableHead
-          order={order}
-          orderBy={orderBy}
-          onRequestSort={handleRequestSort}
-        />
-        <TableBody>
-          {stableSort(rows, getComparator(order, orderBy))
-            .map(row => (
-                <TableRow key={row.hash} hover>
-                  <TableCell>{row.name}</TableCell>
-                  <TableCell align="right">{formatBytes(row.size)}</TableCell>
-                  <TableCell align="right">{formatBytes(row.lastChange.uploaded)}</TableCell>
-                  <TableCell align="right">{formatBytes(row.last10Days.bytes)}</TableCell>
-                  <TableCell align="right">{row.last10Days.ratio}</TableCell>
-                  <TableCell align="right">{secsToTime(row.lastChange.time_active)}</TableCell>
-                  <TableCell align="right">{formatDate(row.added_on)}</TableCell>
-                  <TableCell align="right">{secsToTime(row.last_activity, timestamp)}</TableCell>
-                  <TableCell align="right">
-                    <IconButton size='small'>
-                      <DeleteIcon fontSize='inherit' />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              )
-            )}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <>
+      <TableContainer className={classes.tableContainer}>
+        <Table size='small' stickyHeader>
+          <EnhancedTableHead
+            order={order}
+            orderBy={orderBy}
+            onRequestSort={handleRequestSort}
+          />
+          <TableBody>
+            {stableSort(rows, getComparator(order, orderBy))
+              .map(row => (
+                  <TableRow key={row.hash} hover>
+                    <TableCell>{row.name}</TableCell>
+                    <TableCell align="right">{formatBytes(row.size)}</TableCell>
+                    <TableCell align="right">{formatBytes(row.lastChange.uploaded)}</TableCell>
+                    <TableCell align="right">{formatBytes(row.last10Days.bytes)}</TableCell>
+                    <TableCell align="right">{row.last10Days.ratio}</TableCell>
+                    <TableCell align="right">{secsToTime(row.lastChange.time_active)}</TableCell>
+                    <TableCell align="right">{formatDate(row.added_on)}</TableCell>
+                    <TableCell align="right">{secsToTime(row.last_activity, timestamp)}</TableCell>
+                    <TableCell align="right">
+                      <IconButton size='small' onClick={() => setTargetItem(row)}>
+                        <DeleteIcon fontSize='inherit' />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                )
+              )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <DeleteDialog
+        isOpen={targetItem != null}
+        isPending={isDeletePending}
+        onClose={closeDeleteDialog}
+        onConfirm={onDelete}
+        itemName={targetItem && targetItem.name}
+      />
+    </>
   );
 }

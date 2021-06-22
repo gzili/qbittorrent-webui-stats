@@ -183,6 +183,14 @@ const App = () => {
   const du = useAsync(fetchDiskStats);
   const torrents = useAsync(fetchTorrents);
 
+  const refreshDisks = du.execute;
+  const refreshTorrents = torrents.execute;
+
+  const refreshAll = useCallback(() => {
+    refreshDisks();
+    refreshTorrents();
+  }, [refreshDisks, refreshTorrents]);
+
   return (
     <Flex direction='column' pos='fixed' w='100%' h='100vh' p={8}>
       <Section title='Disks' isLoading={du.status === 'pending'} onRefresh={du.execute}>
@@ -192,7 +200,7 @@ const App = () => {
       </Section>
       <Section title='Torrents' isLoading={torrents.status === 'pending'} onRefresh={torrents.execute} grow>
         {torrents.value && (
-          <TorrentsTable data={torrents.value}/>
+          <TorrentsTable data={torrents.value} refresh={refreshAll} />
         )}
       </Section>
     </Flex>
