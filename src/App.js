@@ -124,7 +124,7 @@ const Section = props => {
 
   return (
       <Flex direction='column' grow={grow ? 1 : null} mb={4}>
-        <Flex justify='space-between'>
+        <Flex justify='space-between' align='center'>
           <Heading as='h1' mb={1} fontSize='4xl'>{title}</Heading>
           <Box>
             { (typeof onRefresh === 'function') && (
@@ -192,7 +192,7 @@ const App = () => {
   }, [refreshDisks, refreshTorrents]);
 
   return (
-    <Flex direction='column' pos='fixed' w='100%' h='100vh' p={8}>
+    <Flex direction='column' pos='fixed' w='100%' h='100vh' p={6}>
       <Section title='Disks' isLoading={du.status === 'pending'} onRefresh={refreshDisks}>
         <Flex>
           {du.value && du.value.map(disk => <DiskItem key={disk.path} stats={disk} />)}
