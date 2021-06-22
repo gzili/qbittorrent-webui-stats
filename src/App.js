@@ -54,7 +54,7 @@ const App = () => {
   const [isLoadingDisks, setLoadingDisks] = useState(true);
   const [diskStats, setDiskStats] = useState(null);
 
-  useEffect(() => reloadDiskStats, []);
+  useEffect(() => reloadDiskStats(), []);
 
   const reloadDiskStats = () => {
     setLoadingDisks(true);
