@@ -3,18 +3,18 @@ const exec = promisify(require('child_process').exec);
 
 async function getDiskUsage(disks) {
 
-  const diskFiles = disks.map(disk => disk.file);
+  const paths = disks.map(disk => disk.path);
 
-  const { stdout } = await exec(['df --output=target,used,avail', ...diskFiles].join(' '));
+  const { stdout } = await exec(['df --output=target,used,avail', ...paths].join(' '));
 
   const diskStats = stdout.split('\n').slice(1, -1).map(line => {
-    let [file, used, avail] = line.split(/\s+/);
+    let [path, used, avail] = line.split(/\s+/);
 
     used *= 1024;
     avail *= 1024;
 
     return ({
-      file: file,
+      path: path,
       size: used + avail,
       used: used,
       free: avail,

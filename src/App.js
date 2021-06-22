@@ -11,11 +11,11 @@ function formatBytes(bytes) {
 }
 
 function DiskItem(props) {
-  let { size, used, free } = props.stats;
+  let { path, size, used, free } = props.stats;
 
   return (
     <div className='diskItemBox'>
-      <div className='diskName'>{props.stats.file}</div>
+      <div className='diskName'>{path}</div>
       <div className='diskUsageBar'>
         <div className='diskUsageBarOuter'>
           <div className='diskUsageBarInner' style={{width: `${(used / size) * 100}%`}}></div>
