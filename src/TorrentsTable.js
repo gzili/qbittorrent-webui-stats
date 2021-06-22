@@ -8,6 +8,8 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
+import IconButton from '@material-ui/core/IconButton';
+import DeleteIcon from '@material-ui/icons/Delete';
 import moment from 'moment';
 
 function formatDate(unixSecs) {
@@ -101,10 +103,10 @@ function descendingComparator(a, b, orderBy) {
     rval = rval[id];
   });
 
-  if (lval < rval) {
+  if (rval < lval) {
     return -1;
   }
-  if (lval > rval) {
+  if (rval > lval) {
     return 1;
   }
   return 0;
@@ -159,6 +161,7 @@ function EnhancedTableHead(props) {
             </TableSortLabel>
           </TableCell>
         ))}
+        <TableCell />
       </TableRow>
     </TableHead>
   );
@@ -223,6 +226,11 @@ export default function TorrentsTable(props) {
                   <TableCell align="right">{secsToTime(row.lastChange.time_active)}</TableCell>
                   <TableCell align="right">{formatDate(row.added_on)}</TableCell>
                   <TableCell align="right">{secsToTime(row.last_activity, timestamp)}</TableCell>
+                  <TableCell align="right">
+                    <IconButton size='small'>
+                      <DeleteIcon fontSize='inherit' />
+                    </IconButton>
+                  </TableCell>
                 </TableRow>
               )
             )}
