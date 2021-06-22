@@ -5,7 +5,7 @@ async function getDiskUsage(disks) {
 
   const diskFiles = disks.map(disk => disk.file);
 
-  const { stdout } = await exec(['df --output=file,used,avail', ...diskFiles].join(' '));
+  const { stdout } = await exec(['df --output=target,used,avail', ...diskFiles].join(' '));
 
   const diskStats = stdout.split('\n').slice(1, -1).map(line => {
     let [file, used, avail] = line.split(/\s+/);
