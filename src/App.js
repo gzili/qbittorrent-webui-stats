@@ -148,7 +148,7 @@ const fetchDiskStats = () => {
     )).catch(() => {
       reject('Error loading disk usage');
     });
-  })
+  });
 }
 
 const fetchTorrents = () => {
