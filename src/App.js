@@ -1,7 +1,45 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { Box, Flex, Heading, Button } from '@chakra-ui/react';
 
 import './App.css';
+
+const useAsync = (asyncFunction, immediate = true) => {
+  const [status, setStatus] = useState('idle');
+  const [value, setValue] = useState(null);
+  const [error, setError] = useState(null);
+
+  // The execute function wraps asyncFunction and
+  // handles setting state for pending, value, and error.
+  // useCallback ensures the below useEffect is not called
+  // on every render, but only if asyncFunction changes.
+  const execute = useCallback(() => {
+    setStatus('pending');
+    //setValue(null);
+    setError(null);
+    return asyncFunction()
+      .then((response) => {
+        setValue(response);
+        setStatus('success');
+      })
+      .catch((error) => {
+        setError(error);
+        setStatus('error');
+      });
+  }, [asyncFunction]);
+
+  // Call execute if we want to fire it right away.
+  // Otherwise execute can be called later, such as
+  // in an onClick handler.
+  useEffect(() => {
+    if (immediate) {
+      execute();
+    }
+  }, [execute, immediate]);
+
+  console.log(value);
+
+  return { execute, status, value, error };
+};
 
 function formatBytes(bytes) {
   const units = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -38,11 +76,13 @@ const Section = props => {
   } = props;
 
   return (
-      <Flex direction='column' grow={grow ? 1 : 0} shrink={grow ? 0 : 1} overflow='hidden'>
+      <Flex direction='column' grow={grow ? 1 : 0} shrink={grow ? 0 : 1} overflow='hidden' mb={4}>
         <Flex justify='space-between'>
           <Heading as='h1' pb={1} fontSize='4xl'>{title}</Heading>
           <Box>
-            <Button colorScheme='teal' size='sm' onClick={onRefresh} isLoading={isLoading}>Refresh</Button>
+            { (typeof onRefresh === 'function') && (
+              <Button colorScheme='teal' size='sm' onClick={onRefresh} isLoading={isLoading}>Refresh</Button>
+            ) }
           </Box>
         </Flex>
         <Box overflow='auto' grow={grow ? 1 : 0}>{children}</Box>
@@ -50,29 +90,29 @@ const Section = props => {
   );
 }
 
-const App = () => {
-  const [isLoadingDisks, setLoadingDisks] = useState(true);
-  const [diskStats, setDiskStats] = useState(null);
-
-  useEffect(() => reloadDiskStats(), []);
-
-  const reloadDiskStats = () => {
-    setLoadingDisks(true);
+const fetchDiskStats = () => {
+  return new Promise((resolve, reject) => {
     fetch('/disks', {
       cache: 'no-store',
     }).then(response => (
       response.json().then(data => {
-        setDiskStats(data);
-        setLoadingDisks(false);
+        resolve(data);
       })
-    ));
-  }
+    )).catch(() => {
+      reject('Error loading disk usage');
+    });
+  })
+}
+
+const App = () => {
+
+  const du = useAsync(fetchDiskStats);
 
   return (
     <Flex direction='column' pos='fixed' w='100%' h='100vh' p={8}>
-      <Section title='Disks' isLoading={isLoadingDisks} onRefresh={reloadDiskStats}>
+      <Section title='Disks' isLoading={du.status === 'pending'} onRefresh={du.execute}>
         <Flex>
-          {diskStats && diskStats.map(disk => <DiskItem key={disk.file} stats={disk} />)}
+          {du.value && du.value.map(disk => <DiskItem key={disk.path} stats={disk} />)}
         </Flex>
       </Section>
     </Flex>
