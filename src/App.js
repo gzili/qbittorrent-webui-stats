@@ -2,6 +2,7 @@ import { useEffect, useCallback, useState } from 'react';
 import { Box, Flex, Text, Heading, Button } from '@chakra-ui/react';
 import moment from 'moment';
 
+import { getTorrentStatsByDay } from './utils';
 import TorrentsTable from './TorrentsTable';
 
 import './App.css';
@@ -47,52 +48,6 @@ function formatBytes(bytes) {
   let p = 0;
   while (Math.pow(1024, p) <= bytes) ++p;
   return (p > 0) ? `${parseFloat((bytes / Math.pow(1024, p - 1)).toFixed(2))} ${units[p - 1]}` : `${bytes} B`;
-}
-
-function getUploadedBytesInLast10Days(data) {
-  const addedDate = moment.unix(data.added_on);
-  let iterDate = moment();
-
-  let daysObj = {};
-  let days = [];
-  let dayCount = 0;
-
-  while (iterDate.isSameOrAfter(addedDate, 'day') && dayCount < 10) {
-    const day = iterDate.format('YYYY-MM-DD');
-    daysObj[day] = [];
-    days.push(day);
-    ++dayCount;
-    iterDate.subtract(1, 'day');
-  }
-
-  for (let i = data.activity.length - 1; i >= 0; --i) {
-    const item = data.activity[i];
-    let itemDate = moment.unix(item.timestamp);
-    if (itemDate.hour() === 0 && itemDate.minute() === 0) itemDate.subtract(1, 'day');
-    const key = itemDate.format('YYYY-MM-DD');
-    if (daysObj.hasOwnProperty(key)) daysObj[key].push(item);
-    else break;
-  }
-
-  let lastDayAmount = null;
-  let last10Days = 0;
-  days.reverse();
-  const addedDateKey = addedDate.format('YYYY-MM-DD');
-  for (let day of days) {
-    const items = daysObj[day];
-    let dayTotal = 0;
-    if (items.length > 0) {
-      if (addedDateKey === day) dayTotal = items[0].uploaded;
-      else {
-        dayTotal = items[0].uploaded - items[items.length - 1].uploaded;
-        if (lastDayAmount !== null) dayTotal += items[items.length - 1].uploaded - lastDayAmount;
-      }
-      lastDayAmount = items[0].uploaded;
-    }
-    last10Days += dayTotal;
-  }
-
-  return last10Days;
 }
 
 function DiskItem(props) {
@@ -160,7 +115,7 @@ const fetchTorrents = () => {
         for (let row of data) {
           row.lastChange = row.activity[row.activity.length - 1];
 
-          let last10DaysBytes = getUploadedBytesInLast10Days(row);
+          let last10DaysBytes = getTorrentStatsByDay(row, 10).total;
           row.last10Days = {
             bytes: last10DaysBytes,
             ratio: +(last10DaysBytes / row.size).toFixed(2),
