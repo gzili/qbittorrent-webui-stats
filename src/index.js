@@ -16,7 +16,10 @@ const theme = extendTheme({
   fonts: {
     body: '"Inter", sans-serif',
     heading: '"Inter", sans-serif',
-  }
+  },
+  shadows: {
+    outline: '0 0 0 3px rgba(56, 178, 172, 0.6)', // teal.400
+  },
 });
 
 ReactDOM.render(
