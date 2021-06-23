@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useState } from 'react';
-import { Box, Flex, Heading, Button } from '@chakra-ui/react';
+import { Box, Flex, Text, Heading, Button } from '@chakra-ui/react';
 import moment from 'moment';
 
 import TorrentsTable from './TorrentsTable';
@@ -99,17 +99,17 @@ function DiskItem(props) {
   let { path, size, used, free } = props.stats;
 
   return (
-    <div className='diskItemBox'>
-      <div className='diskName'>{path}</div>
-      <div className='diskUsageBar'>
-        <div className='diskUsageBarOuter'>
-          <div className='diskUsageBarInner' style={{width: `${(used / size) * 100}%`}}></div>
-        </div>
-      </div>
-      <div className='diskUsageText'>
+    <Box w='20%' _notLast={{ mr: '2.5' }} p='2.5' bgColor='#fff' borderRadius='md'>
+      <Text fontWeight='bold'>{path}</Text>
+      <Box py='1'>
+        <Box pos='relative' w='100%' h='20px' bgColor='rgba(49, 151, 149, 0.4)' borderRadius='md' overflow='hidden'>
+          <Box pos='absolute' w={`${(used / size) * 100}%`} h='100%' bgColor='teal.500'/>
+        </Box>
+      </Box>
+      <Text fontSize='sm'>
         {`${formatBytes(used)} of ${formatBytes(size)} used (${formatBytes(free)} available)`}
-      </div>
-    </div>
+      </Text>
+    </Box>
   );
 }
 
