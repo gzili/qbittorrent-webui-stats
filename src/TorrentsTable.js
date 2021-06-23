@@ -302,7 +302,7 @@ const useTableStyles = makeStyles((theme) => ({
     right: 0,
     overflowY: 'auto',
     backgroundColor: '#fff',
-    borderRadius: theme.shape.borderRadius,
+    borderRadius: '0.375rem', // radii.md
   },
 }));
 
