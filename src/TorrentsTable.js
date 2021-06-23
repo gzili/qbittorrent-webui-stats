@@ -21,6 +21,7 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 
 import {
+  useTheme,
   AlertDialog,
   AlertDialogBody,
   AlertDialogFooter,
@@ -226,6 +227,8 @@ EnhancedTableHead.propTypes = {
 const ActivityChart = props => {
   const { row } = props;
 
+  const theme = useTheme();
+
   const [daysToShow, setDaysToShow] = useState(10);
 
   const handleChange = e => {
@@ -294,11 +297,11 @@ const ActivityChart = props => {
       </Flex>
       <ResponsiveContainer width='100%' height={400}>
         <BarChart data={statsArray} margin={{ top: 20 }}>
-          <CartesianGrid vertical={false} stroke='#ECEFF1' />
-          <XAxis dataKey='date' tickLine={false} tick={{ fill: '#90A4AE' }} axisLine={false} />
-          <YAxis width={90} tickLine={false} axisLine={false} tickFormatter={ v => formatBytes(v) } tick={{ fill: '#90A4AE' }} />
-          <Bar dataKey='uploaded' fill='#2979FF' radius={[5, 5, 0, 0]} isAnimationActive={false}>
-            <LabelList dataKey='uploaded' position='top' formatter={v => formatBytes(v) } fill='#90A4AE' />
+          <CartesianGrid vertical={false} stroke='#E0E0E0' />
+          <XAxis dataKey='date' tickLine={false} tick={{ fill: '#9E9E9E' }} axisLine={false} />
+          <YAxis width={90} tickLine={false} axisLine={false} tickFormatter={ v => formatBytes(v) } tick={{ fill: '#9E9E9E' }} />
+          <Bar dataKey='uploaded' fill={theme.colors.teal['500']} radius={[5, 5, 0, 0]} isAnimationActive={false}>
+            <LabelList dataKey='uploaded' position='top' formatter={v => formatBytes(v) } fill='#9E9E9E' />
           </Bar>
         </BarChart>
       </ResponsiveContainer>
