@@ -6,8 +6,6 @@ import { fetchDiskStats, fetchTorrents } from './adapters';
 import DiskItems from './DiskItems';
 import TorrentsTable from './TorrentsTable';
 
-import './App.css';
-
 const Section = props => {
   const {
     grow,
