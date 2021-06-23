@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import moment from 'moment';
 
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, useTheme as useMuiTheme } from '@material-ui/core/styles';
 import {
   Table,
   TableBody,
@@ -142,7 +142,7 @@ const DeleteDialog = props => {
   );
 }
 
-const useRowStyles = makeStyles({
+const useRowStyles = makeStyles(theme => ({
   root: {
     '& > *': {
       borderBottom: 'unset',
@@ -160,7 +160,10 @@ const useRowStyles = makeStyles({
   icon: {
     fontSize: 20,
   },
-});
+  grayText: {
+    color: theme.palette.grey['500'],
+  },
+}));
 
 const headCells = [
   { id: 'name', numeric: false, cls: 'leftCell', label: 'Name' },
@@ -215,6 +218,7 @@ const ActivityChart = props => {
   const { row } = props;
 
   const theme = useTheme();
+  const materialGrey = useMuiTheme().palette.grey;
 
   const [daysToShow, setDaysToShow] = useState(10);
 
@@ -239,11 +243,11 @@ const ActivityChart = props => {
       </Flex>
       <ResponsiveContainer width='100%' height={400}>
         <BarChart data={stats} margin={{ top: 20 }}>
-          <CartesianGrid vertical={false} stroke='#E0E0E0' />
-          <XAxis dataKey='date' tickLine={false} tick={{ fill: '#9E9E9E' }} axisLine={false} />
-          <YAxis width={90} tickLine={false} axisLine={false} tickFormatter={ v => formatBytes(v) } tick={{ fill: '#9E9E9E' }} />
+          <CartesianGrid vertical={false} stroke={materialGrey['200']} />
+          <XAxis dataKey='date' tickLine={false} tick={{ fill: materialGrey['600'] }} axisLine={false} />
+          <YAxis width={90} tickLine={false} axisLine={false} tickFormatter={ v => formatBytes(v) } tick={{ fill: materialGrey['600'] }} />
           <Bar dataKey='uploaded' fill={theme.colors.teal['500']} radius={[5, 5, 0, 0]} isAnimationActive={false}>
-            <LabelList dataKey='uploaded' position='top' formatter={v => formatBytes(v) } fill='#9E9E9E' />
+            <LabelList dataKey='uploaded' position='top' formatter={v => formatBytes(v) } fill={materialGrey['600']} />
           </Bar>
         </BarChart>
       </ResponsiveContainer>
@@ -273,7 +277,12 @@ const ExpandableTableRow = props => {
         <TableCell className={classes.leftCell}>{row.name}</TableCell>
         <TableCell align="right">{formatBytes(row.size)}</TableCell>
         <TableCell align="right">{formatBytes(row.lastChange.uploaded)}</TableCell>
-        <TableCell align="right">{formatBytes(row.last10Days.bytes)}</TableCell>
+        <TableCell
+          align="right"
+          className={(row.last10Days.bytes === row.lastChange.uploaded) ? classes.grayText : null}
+        >
+          {formatBytes(row.last10Days.bytes)}
+        </TableCell>
         <TableCell align="right">{row.last10Days.ratio}</TableCell>
         <TableCell align="right">{secsToTime(row.lastChange.time_active)}</TableCell>
         <TableCell align="right">{secsToTime(row.last_activity, timestamp)}</TableCell>
@@ -293,7 +302,7 @@ const ExpandableTableRow = props => {
   );
 }
 
-const useTableStyles = makeStyles((theme) => ({
+const useTableStyles = makeStyles({
   tableContainer: {
     position: 'absolute',
     top: 0,
@@ -304,7 +313,7 @@ const useTableStyles = makeStyles((theme) => ({
     backgroundColor: '#fff',
     borderRadius: '0.375rem', // radii.md
   },
-}));
+});
 
 export default function TorrentsTable(props) {
   const {
