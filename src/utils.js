@@ -1,5 +1,12 @@
 import moment from 'moment';
 
+export function formatBytes(bytes) {
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  let p = 0;
+  while (Math.pow(1024, p) <= bytes) ++p;
+  return (p > 0) ? `${parseFloat((bytes / Math.pow(1024, p - 1)).toFixed(2))} ${units[p - 1]}` : `${bytes} B`;
+}
+
 export function getTorrentStatsByDay(row, maxDays) {
   const addedDate = moment.unix(row.added_on);
   let iterDate = moment();

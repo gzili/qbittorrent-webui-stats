@@ -37,26 +37,10 @@ import {
 
 import { ResponsiveContainer, BarChart, Bar, CartesianGrid, XAxis, YAxis, LabelList } from 'recharts';
 
-import { getTorrentStatsByDay } from './utils';
-
-const deleteTorrent = hash => {
-  return new Promise((resolve, reject) => {
-    fetch('/delete', {
-      method: 'POST',
-      body: hash,
-    }).then(() => resolve());
-  });
-}
+import { formatBytes, getTorrentStatsByDay } from './utils';
 
 function formatDate(unixSecs) {
   return moment.unix(unixSecs).format('YYYY-MM-DD HH:mm:ss');
-}
-
-function formatBytes(bytes) {
-  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-  let p = 0;
-  while (Math.pow(1024, p) <= bytes) ++p;
-  return (p > 0) ? `${parseFloat((bytes / Math.pow(1024, p - 1)).toFixed(2))} ${units[p - 1]}` : `${bytes} B`;
 }
 
 function secsToTime(unixSecs, diffSecs) {
@@ -81,6 +65,15 @@ function secsToTime(unixSecs, diffSecs) {
   if (isDiff) str += ' ago';
 
   return str;
+}
+
+const deleteTorrent = hash => {
+  return new Promise((resolve, reject) => {
+    fetch('/delete', {
+      method: 'POST',
+      body: hash,
+    }).then(() => resolve());
+  });
 }
 
 function descendingComparator(a, b, orderBy) {

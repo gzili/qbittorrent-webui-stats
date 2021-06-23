@@ -2,7 +2,7 @@ import { useEffect, useCallback, useState } from 'react';
 import { Box, Flex, Text, Heading, Button } from '@chakra-ui/react';
 import moment from 'moment';
 
-import { getTorrentStatsByDay } from './utils';
+import { formatBytes, getTorrentStatsByDay } from './utils';
 import TorrentsTable from './TorrentsTable';
 
 import './App.css';
@@ -42,13 +42,6 @@ const useAsync = (asyncFunction, immediate = true) => {
 
   return { execute, status, value, error };
 };
-
-function formatBytes(bytes) {
-  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-  let p = 0;
-  while (Math.pow(1024, p) <= bytes) ++p;
-  return (p > 0) ? `${parseFloat((bytes / Math.pow(1024, p - 1)).toFixed(2))} ${units[p - 1]}` : `${bytes} B`;
-}
 
 function DiskItem(props) {
   let { path, size, used, free } = props.stats;
