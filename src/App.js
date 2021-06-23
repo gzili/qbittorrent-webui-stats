@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
-import moment from 'moment';
 import { Box, Flex, Text, Heading, Button } from '@chakra-ui/react';
 
 import { useAsync } from './hooks';
-import { formatBytes, getTorrentStatsByDay } from './utils';
+import { fetchDiskStats, fetchTorrents } from './adapters';
+import { formatBytes } from './utils';
 import TorrentsTable from './TorrentsTable';
 
 import './App.css';
@@ -48,47 +48,6 @@ const Section = props => {
         <Box position='relative' flexGrow={grow ? 1 : null}>{children}</Box>
       </Flex>
   );
-}
-
-const fetchDiskStats = () => {
-  return new Promise((resolve, reject) => {
-    fetch('/disks', {
-      cache: 'no-store',
-    }).then(response => (
-      response.json().then(data => {
-        resolve(data);
-      })
-    )).catch(() => {
-      reject('Error loading disk usage');
-    });
-  });
-}
-
-const fetchTorrents = () => {
-  return new Promise((resolve, reject) => {
-    fetch('/stats', {
-      cache: 'no-store',
-    }).then(response => {
-      response.json().then(data => {
-        for (let row of data) {
-          row.lastChange = row.activity[row.activity.length - 1];
-
-          let last10DaysBytes = getTorrentStatsByDay(row, 10).total;
-          row.last10Days = {
-            bytes: last10DaysBytes,
-            ratio: +(last10DaysBytes / row.size).toFixed(2),
-          };
-        }
-
-        resolve({
-          timestamp: moment().minute(0).second(0).unix(),
-          rows: data,
-        });
-      })
-    }).catch(() => {
-      reject('Error loading torrents')
-    });
-  });
 }
 
 const App = () => {

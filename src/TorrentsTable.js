@@ -37,6 +37,7 @@ import {
 
 import { ResponsiveContainer, BarChart, Bar, CartesianGrid, XAxis, YAxis, LabelList } from 'recharts';
 
+import { deleteTorrent } from './adapters';
 import { formatBytes, getTorrentStatsByDay } from './utils';
 
 function formatDate(unixSecs) {
@@ -65,15 +66,6 @@ function secsToTime(unixSecs, diffSecs) {
   if (isDiff) str += ' ago';
 
   return str;
-}
-
-const deleteTorrent = hash => {
-  return new Promise((resolve, reject) => {
-    fetch('/delete', {
-      method: 'POST',
-      body: hash,
-    }).then(() => resolve());
-  });
 }
 
 function descendingComparator(a, b, orderBy) {
