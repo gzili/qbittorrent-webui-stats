@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import { Box, Flex, Heading, Button } from '@chakra-ui/react';
 
 import { useAsync } from './hooks';
@@ -38,11 +37,6 @@ const App = () => {
   const refreshDisks = du.execute;
   const refreshTorrents = torrents.execute;
 
-  const refreshAll = useCallback(() => {
-    refreshDisks();
-    refreshTorrents();
-  }, [refreshDisks, refreshTorrents]);
-
   return (
     <Flex direction='column' pos='fixed' w='100%' h='100vh' p={6}>
       <Section title='Disks' isLoading={du.status === 'pending'} onRefresh={refreshDisks}>
@@ -50,7 +44,7 @@ const App = () => {
       </Section>
       <Section title='Torrents' isLoading={torrents.status === 'pending'} onRefresh={refreshTorrents} grow>
         {torrents.value && (
-          <TorrentsTable data={torrents.value} refresh={refreshAll} />
+          <TorrentsTable data={torrents.value} refresh={refreshTorrents} />
         )}
       </Section>
     </Flex>

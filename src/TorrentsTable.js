@@ -192,6 +192,7 @@ function EnhancedTableHead(props) {
             align={headCell.numeric ? 'right' : 'left'}
             sortDirection={orderBy === headCell.id ? order : false}
             className={classes[headCell.cls]}
+            style={{ fontWeight: 'bold' }}
           >
             <TableSortLabel
               active={orderBy === headCell.id}

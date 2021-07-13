@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
+import { createMuiTheme, ThemeProvider as MuiProvider } from '@material-ui/core';
 
 import App from './App';
 
@@ -22,10 +23,18 @@ const theme = extendTheme({
   },
 });
 
+const muiTheme = createMuiTheme({
+  typography: {
+    fontFamily: '"Inter", sans-serif',
+  },
+});
+
 ReactDOM.render(
   <React.StrictMode>
     <ChakraProvider theme={theme}>
-      <App />
+      <MuiProvider theme={muiTheme}>
+        <App />
+      </MuiProvider>
     </ChakraProvider>
   </React.StrictMode>,
   document.getElementById('root')
