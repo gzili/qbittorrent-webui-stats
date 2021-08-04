@@ -1,7 +1,7 @@
 # qBittorrent WebUI Statistics
 Utilities to collect and visualize statistical torrent activity data from [qBittorrent](https://github.com/qbittorrent/qBittorrent) WebUI API.
 
-![Individual torrent view demo](docs/demo-scr.png)
+![Individual torrent view demo](docs/demo-scr-v2.png)
 
 ## Motivation
 This project is meant help seeders who use [qbittorrent-nox](https://github.com/qbittorrent/qBittorrent) and seek an easier way of determining which torrents are the least active when it is time to free up disk space for newer torrents.
@@ -31,8 +31,8 @@ After installation, `config.json` in the [server](server) directory should be re
 - The frontend can be accessed at `localhost` from a WEB browser on a PC in your local network.
 
 ## Todos
-- [*] Show the total upload amount of last 10 days in the main torrents table
-- [*] Ability to change the maximum number of days displayed in the bar chart
+- [x] Show the total upload amount of last 10 days in the main torrents table
+- [x] Ability to change the maximum number of days displayed in the bar chart
 - [ ] Error handling both in server and the UI
 - [ ] Chart ticks at round and predictable values
 - [ ] Server port configuration option
